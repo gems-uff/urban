@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--
+ * Urban data visualization.
+ * Universidade Federal Fluminense.
+ * 
+ * Copyright (C) 2014 - Prof. Marcos Lage
+-->
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Urbs: Visualização de Dados Urbanos</title>
+        <style>
+            html, body, #map-div {
+                margin: 0; padding: 0; height: 100%;
+            }
+        </style>
+        <!-- Extern script files -->
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnZhZH_0Lu730dmnvSpO31c0wO_gCxhsg&sensor=false"></script>
+        <script type="text/javascript" src="libs/CanvasLayer.js"></script>
+
+        <!-- My script files -->
+        <script type="text/javascript" src="src/Utils.js"></script>
+        <script type="text/javascript" src="src/ShaderProgram.js"></script>
+        <script type="text/javascript" src="src/ReadData.js"></script>
+        <script type="text/javascript" src="src/Main.js"></script>
+    </head>
+    <body>
+        <div id="map-div"></div>
+    </body>
+</html>
