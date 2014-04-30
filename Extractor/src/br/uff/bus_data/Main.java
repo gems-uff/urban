@@ -5,9 +5,17 @@
  */
 package br.uff.bus_data;
 
+import br.uff.bus_data.dao.ColetaDAO;
+import br.uff.bus_data.dao.DadoRJDAO;
+import br.uff.bus_data.dao.LinhaDAO;
+import br.uff.bus_data.dao.OrdemDAO;
+import br.uff.bus_data.helper.ColetaDBUtils;
 import br.uff.bus_data.helper.Constants;
 import br.uff.bus_data.helper.DBConnection;
-import br.uff.bus_data.helper.DBHelper;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import br.uff.bus_data.models.Linha;
+import br.uff.bus_data.models.Ordem;
+import br.uff.bus_data.models.Position;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,14 +23,14 @@ import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import java.util.Date;
-import java.util.Map;
 
 /**
  *
@@ -42,10 +50,9 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         try {
-
             Class.forName("com.mysql.jdbc.Driver");
-            String connectionUrl = "jdbc:"+ DBConnection.JDBC + ":"+ DBConnection.DATABASE +"?"
-                    + "user="+ DBConnection.USER + "&password="+ DBConnection.PASSWORD;
+            String connectionUrl = "jdbc:" + DBConnection.JDBC + ":" + DBConnection.DATABASE + "?"
+                    + "user=" + DBConnection.USER + "&password=" + DBConnection.PASSWORD;
             Connection con = DriverManager.getConnection(connectionUrl);
 
             Statement stmt = null;
@@ -56,16 +63,28 @@ public class Main {
 
             stmt = con.createStatement();
             File[] files = finder(helper + "/jsons");
+            HashMap<String, Integer> linhas = new HashMap<String, Integer>(); // entrada: numero da linha; saída: id da linha
+            HashMap<String, Integer> ordens = new HashMap<String, Integer>();// entrada: ordem do ônibus; saída: id da ordem
+            HashMap<String, Position> posicoes = new HashMap<String, Position>();// entrada: ordem do ônibus; saída: ultima posicao do onibus
+            ColetaDAO coletaDao = new ColetaDAO();
+            coletaDao.setStatement(stmt);
+
+            LinhaDAO linhaDao = new LinhaDAO();
+            linhaDao.setStatement(stmt);
+            OrdemDAO ordemDao = new OrdemDAO();
+            ordemDao.setStatement(stmt);
+            DadoRJDAO dadoRJDao = new DadoRJDAO();
+            dadoRJDao.setStatement(stmt);
 
             for (File file : files) {
                 if (file.isFile()) {
                     try {
-                        coletaId = DBHelper.insereColeta(stmt);
+                        coletaId = coletaDao.insert(ColetaDBUtils.insertDefaultParams(file.getName()));
                         JSONObject rootObject = (JSONObject) parser.parse(new FileReader(file.getAbsoluteFile()));
                         ArrayList<String> colunas = (ArrayList<String>) rootObject.get(Constants.KEY_COLUNAS);
                         for (int i = 0; i < colunas.size(); i++) {
                             if (!colunas.get(i).equals(Constants.COLUNAS[i])) {
-                                DBHelper.finalizaColetaComErros(stmt, coletaId, Constants.MSG_ERRO_COLUNAS);
+                                ColetaDBUtils.finalizaColetaComErros(coletaDao, coletaId, Constants.MSG_ERRO_COLUNAS);
                                 return;
                             }
                         }
@@ -80,16 +99,15 @@ public class Main {
 
                             if (!linha.isEmpty()) {
                                 params.put(Constants.KEY_LINHA, "'" + linha.split("\\.")[0] + "'");
-                                rs = DBHelper.busca(stmt, "linhas", "id", params);
-
-                                if (rs.next()) {
-                                    linhaId = (int) rs.getLong(1);
-                                }
-                                if (linhaId == null) {
+                                List<Linha> result = linhaDao.select(params);
+                                if (result.isEmpty()) {
                                     params.clear();
                                     params.put(Constants.KEY_LINHA, "'" + linha.split("\\.")[0] + "'");
-                                    linhaId = DBHelper.insereLinha(stmt, params);
+                                    linhaId = linhaDao.insert(params);
+                                } else {
+                                    linhaId = (int) result.get(0).getId();
                                 }
+
                             }
 
                             String ordem = String.valueOf(dado.get(Constants.INDEX_ORDEM));
@@ -98,16 +116,15 @@ public class Main {
                             if (!ordem.isEmpty()) {
                                 params.clear();
                                 params.put(Constants.KEY_ORDEM, "'" + ordem + "'");
-                                rs = DBHelper.busca(stmt, "ordens", "id", params);
-
-                                if (rs.next()) {
-                                    ordemId = (int) rs.getLong(1);
-                                }
-                                if (ordemId == null) {
+                                List<Ordem> res = ordemDao.select(params);
+                                if (res.isEmpty()) {
                                     params.clear();
                                     params.put(Constants.KEY_ORDEM, "'" + ordem + "'");
-                                    ordemId = DBHelper.insereOrdem(stmt, params);
+                                    ordemId = ordemDao.insert(params);
+                                } else {
+                                    ordemId = (int) res.get(0).getId();
                                 }
+
                             }
                             params.clear();
                             SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
@@ -125,21 +142,19 @@ public class Main {
                             params.put("linha_id", String.valueOf(linhaId));
                             params.put("ordem_id", String.valueOf(ordemId));
                             params.put("data_hora", "'" + data + "'");
-
-                            rs = DBHelper.busca(stmt, "dados_rj","id", params);
-
-                            if (!rs.next()) {
-                                params.put("latitude", String.valueOf(dado.get(Constants.INDEX_LATITUDE)));
-                                params.put("longitude", String.valueOf(dado.get(Constants.INDEX_LONGITUDE)));
-                                params.put("velocidade", String.valueOf(dado.get(Constants.INDEX_VELOCIDADE)));
-                                DBHelper.insereDados(stmt, params);
+                            params.put("latitude", String.valueOf(dado.get(Constants.INDEX_LATITUDE)));
+                            params.put("longitude", String.valueOf(dado.get(Constants.INDEX_LONGITUDE)));
+                            params.put("velocidade", String.valueOf(dado.get(Constants.INDEX_VELOCIDADE)));
+                            try {
+                                dadoRJDao.insert(params);
+                            } catch (MySQLIntegrityConstraintViolationException e) {
                             }
                         }
-                        DBHelper.finalizaColetaComSucesso(stmt, coletaId);
+                        ColetaDBUtils.finalizaColetaComSucesso(coletaDao, coletaId);
 
                         System.out.println("file " + file.getName());
                     } catch (IOException | ParseException ex) {
-                        DBHelper.finalizaColetaComErros(stmt, coletaId, ex.getMessage());
+                        ColetaDBUtils.finalizaColetaComErros(coletaDao, coletaId, ex.getMessage());
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }

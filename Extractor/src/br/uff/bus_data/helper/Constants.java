@@ -36,5 +36,7 @@ public class Constants {
 
     public static final String KEY_COLUNAS = "COLUMNS";
     public static final String KEY_DADOS = "DATA";
+    
+    public static final String DB_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
 }

@@ -1,4 +1,6 @@
 __pycache__
 *.db
 .DS_Store
-Extractor/src/br/uff/bus_data/helper/DBConnection.java
+/Extractor/src/br/uff/bus_data/helper/DBConnection.java
+/Extractor/dist/
+/Extractor/jsons/
