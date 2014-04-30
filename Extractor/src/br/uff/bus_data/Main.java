@@ -12,10 +12,11 @@ import br.uff.bus_data.dao.OrdemDAO;
 import br.uff.bus_data.helper.ColetaDBUtils;
 import br.uff.bus_data.helper.Constants;
 import br.uff.bus_data.helper.DBConnection;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import br.uff.bus_data.helper.HashUtils;
 import br.uff.bus_data.models.Linha;
 import br.uff.bus_data.models.Ordem;
 import br.uff.bus_data.models.Position;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
@@ -38,9 +40,9 @@ import org.json.simple.parser.ParseException;
  */
 public class Main {
 
-    private static Integer coletaId;
-    private static Integer linhaId;
-    private static Integer ordemId;
+    private static Long coletaId;
+    private static Long linhaId;
+    private static Long ordemId;
 
     public static File[] finder(String dirName) {
         File dir = new File(dirName);
@@ -63,9 +65,9 @@ public class Main {
 
             stmt = con.createStatement();
             File[] files = finder(helper + "/jsons");
-            HashMap<String, Integer> linhas = new HashMap<String, Integer>(); // entrada: numero da linha; saída: id da linha
-            HashMap<String, Integer> ordens = new HashMap<String, Integer>();// entrada: ordem do ônibus; saída: id da ordem
-            HashMap<String, Position> posicoes = new HashMap<String, Position>();// entrada: ordem do ônibus; saída: ultima posicao do onibus
+            Map<String, Long> linhasHash = HashUtils.loadLinhas(stmt); // entrada: numero da linha; saída: id da linha
+            Map<String, Long> ordensHash = HashUtils.loadOrdens(stmt);// entrada: ordem do ônibus; saída: id da ordem
+            Map<Long, Position> posicoesHash = HashUtils.loadPosicoes(stmt);// entrada: ordem do ônibus; saída: ultima posicao do onibus
             ColetaDAO coletaDao = new ColetaDAO();
             coletaDao.setStatement(stmt);
 
@@ -98,14 +100,15 @@ public class Main {
                             linhaId = null;
 
                             if (!linha.isEmpty()) {
-                                params.put(Constants.KEY_LINHA, "'" + linha.split("\\.")[0] + "'");
-                                List<Linha> result = linhaDao.select(params);
-                                if (result.isEmpty()) {
+                                linha = linha.split("\\.")[0];
+//                                params.put(Constants.KEY_LINHA, "'" + linha + "'");
+                               linhaId = linhasHash.get(linha);
+//                                List<Linha> result = linhaDao.select(params);
+                                if (linhaId == null) {
                                     params.clear();
-                                    params.put(Constants.KEY_LINHA, "'" + linha.split("\\.")[0] + "'");
+                                    params.put(Constants.KEY_LINHA, "'" + linha + "'");
                                     linhaId = linhaDao.insert(params);
-                                } else {
-                                    linhaId = (int) result.get(0).getId();
+                                    linhasHash.put(linha, linhaId);
                                 }
 
                             }
@@ -114,15 +117,15 @@ public class Main {
                             ordemId = null;
 
                             if (!ordem.isEmpty()) {
-                                params.clear();
-                                params.put(Constants.KEY_ORDEM, "'" + ordem + "'");
-                                List<Ordem> res = ordemDao.select(params);
-                                if (res.isEmpty()) {
+//                                params.clear();
+//                                params.put(Constants.KEY_ORDEM, "'" + ordem + "'");
+//                                List<Ordem> res = ordemDao.select(params);
+                                ordemId = ordensHash.get(ordem);
+                                if (ordemId == null) {
                                     params.clear();
                                     params.put(Constants.KEY_ORDEM, "'" + ordem + "'");
                                     ordemId = ordemDao.insert(params);
-                                } else {
-                                    ordemId = (int) res.get(0).getId();
+                                    ordensHash.put(ordem, ordemId);
                                 }
 
                             }

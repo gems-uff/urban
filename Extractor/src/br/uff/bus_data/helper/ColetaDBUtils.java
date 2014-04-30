@@ -31,7 +31,7 @@ public class ColetaDBUtils {
         return params;
     }
 
-    public static void finalizaColetaComSucesso(ColetaDAO dao, Integer coletaId) throws SQLException {
+    public static void finalizaColetaComSucesso(ColetaDAO dao, Long coletaId) throws SQLException {
         Map<String, String> params = new HashMap<>();
         SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date d = new Date();
@@ -40,7 +40,7 @@ public class ColetaDBUtils {
         dao.update(params, coletaId);
     }
 
-    public static void finalizaColetaComErros(ColetaDAO dao, Integer coletaId, String erros) throws SQLException {
+    public static void finalizaColetaComErros(ColetaDAO dao, Long coletaId, String erros) throws SQLException {
         Map<String, String> params = new HashMap<>();
         SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date d = new Date();

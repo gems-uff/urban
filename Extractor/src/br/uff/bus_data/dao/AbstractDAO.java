@@ -33,7 +33,7 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
 
     public abstract List<String> getAttributes();
 
-    public List<Integer> insert(List<Map<String, String>> params) throws SQLException {
+    public List<Long> insert(List<Map<String, String>> params) throws SQLException {
         String attributes = "(";
         List<String> attrs = getAttributes();
         for (String attr : attrs) {
@@ -56,14 +56,14 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         query += values;
         stmt.executeUpdate(query, new String[] {"id"});
         ResultSet rs = stmt.getGeneratedKeys();
-        ArrayList<Integer> ids = new ArrayList<Integer>();
+        ArrayList<Long> ids = new ArrayList<Long>();
         while (rs.next()) {
-            ids.add((int) rs.getLong(1));
+            ids.add(rs.getLong(1));
         }
         return ids;
     }
 
-    public Integer insert(Map<String, String> params) throws SQLException {
+    public Long insert(Map<String, String> params) throws SQLException {
         String attributes = "(";
         List<String> attrs = getAttributes();
         for (String attr : attrs) {
@@ -87,7 +87,7 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
             return null;
         }
         rs.next();
-        return (int) rs.getLong(1);
+        return rs.getLong(1);
     }
 
     public void update(T object) throws SQLException {
@@ -103,7 +103,7 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         stmt.executeUpdate(query);
     }
 
-    public void update(Map<String, String> params, int id) throws SQLException {
+    public void update(Map<String, String> params, Long id) throws SQLException {
         String query = "UPDATE " + getTableName() + " SET ";
         for (String c : params.keySet()) {
             query += " " + c + " = " + params.get(c) + ",";

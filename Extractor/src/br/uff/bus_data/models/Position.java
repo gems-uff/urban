@@ -11,10 +11,26 @@ package br.uff.bus_data.models;
  * @author schettino
  */
 public class Position implements Comparable<Position> {
-    int lat;
-    int lon;
-    
-    public Position(int la, int lo){
+    float lat;
+    float lon;
+
+    public float getLat() {
+        return lat;
+    }
+
+    public void setLat(float lat) {
+        this.lat = lat;
+    }
+
+    public float getLon() {
+        return lon;
+    }
+
+    public void setLon(float lon) {
+        this.lon = lon;
+    }
+
+    public Position(float la, float lo){
         this.lat = la;
         this.lon = lo;
     }

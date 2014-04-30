@@ -89,8 +89,11 @@ public class DadoRJ implements Comparable<DadoRJ>, Mappable<String, String> {
     public void setVelocidade(float velocidade) {
         this.velocidade = velocidade;
     }
-    
-    
+
+    public Position getPosition() {
+        Position p = new Position(this.latitude, this.longitude);
+        return p;
+    }
 
     @Override
     public int compareTo(DadoRJ o) {
