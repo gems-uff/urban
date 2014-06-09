@@ -1,0 +1,537 @@
+Connecting to database specified by database.yml
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:26:15 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 500 Internal Server Error in 5.7ms
+
+NameError (uninitialized constant Api::V1::DadosRjController::HttpResponse):
+  app/controllers/api/v1/dados_rj_controller.rb:16:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (2.5ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (2.0ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (53.2ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:28:20 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 500 Internal Server Error in 2.4ms
+
+NameError (uninitialized constant Api::V1::DadosRjController::HttpResponse):
+  app/controllers/api/v1/dados_rj_controller.rb:16:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (27.0ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (1.0ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (35.5ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:29:24 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 200 OK in 185.8ms (Views: 56.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:31:45 -0300
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 200 OK in 7.3ms (Views: 0.8ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:32:16 -0300
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 200 OK in 3.3ms (Views: 0.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:38:39 -0300
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 200 OK in 11.4ms (Views: 0.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:41:21 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 200 OK in 85.7ms (Views: 7.8ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml" for 127.0.0.1 at 2014-06-03 15:42:08 -0300
+Processing by Api::V1::DadosRjController#from_current_week as XML
+Completed 200 OK in 14.0ms (Views: 0.6ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml?line=332" for 127.0.0.1 at 2014-06-03 15:42:23 -0300
+Processing by Api::V1::DadosRjController#from_current_week as XML
+  Parameters: {"line"=>"332"}
+  [1m[36m (20.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (50.7ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332'
+Completed 200 OK in 430.0ms (Views: 0.7ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml?line=332" for 127.0.0.1 at 2014-06-03 15:43:01 -0300
+Processing by Api::V1::DadosRjController#from_current_week as XML
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.2ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (24.6ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mDadoRj Load (23008.0ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-06-02 03:00:00' AND '2014-06-03 18:43:02') ORDER BY data_hora
+  [1m[36mEXPLAIN (26.1ms)[0m  [1mEXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-06-02 03:00:00' AND '2014-06-03 18:43:02') ORDER BY data_hora[0m
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-06-02 03:00:00' AND '2014-06-03 18:43:02') ORDER BY data_hora
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra                       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where; Using filesort |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+1 row in set (0.03 sec)
+
+Completed 200 OK in 23143.1ms (Views: 0.9ms | ActiveRecord: 0.0ms)
+Connecting to database specified by database.yml
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml?line=332" for 127.0.0.1 at 2014-06-03 15:46:41 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as XML
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.2ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mDadoRj Load (19967.9ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:46:41') ORDER BY data_hora
+  [1m[36mEXPLAIN (0.5ms)[0m  [1mEXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:46:41') ORDER BY data_hora[0m
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:46:41') ORDER BY data_hora
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra                       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where; Using filesort |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+1 row in set (0.00 sec)
+
+Completed 200 OK in 41841.3ms (Views: 8312.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.xml?line=332" for 127.0.0.1 at 2014-06-03 15:49:47 -0300
+Processing by Api::V1::DadosRjController#from_current_week as XML
+  Parameters: {"line"=>"332"}
+  [1m[35m (0.5ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mLinha Load (0.1ms)[0m  [1mSELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1[0m
+  [1m[35mCACHE (0.0ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mDadoRj Load (49765.4ms)[0m  [1mSELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:49:47') ORDER BY data_hora[0m
+  [1m[35mEXPLAIN (0.6ms)[0m  EXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:49:47') ORDER BY data_hora
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:49:47') ORDER BY data_hora
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra                       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where; Using filesort |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+1 row in set (0.00 sec)
+
+Completed 200 OK in 63237.4ms (Views: 3.5ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-03 15:52:52 -0300
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36mLinha Load (0.2ms)[0m  [1mSELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1[0m
+  [1m[35mDadoRj Load (25976.8ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:52:52') ORDER BY data_hora
+  [1m[36mEXPLAIN (1.1ms)[0m  [1mEXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:52:52') ORDER BY data_hora[0m
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-26 18:52:52') ORDER BY data_hora
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra                       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where; Using filesort |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+1 row in set (0.00 sec)
+
+Completed 200 OK in 39510.7ms (Views: 0.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-03 15:59:33 -0300
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[35m (0.2ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mLinha Load (0.1ms)[0m  [1mSELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1[0m
+  [1m[35mCACHE (0.0ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mDadoRj Load (19722.7ms)[0m  [1mSELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 18:59:33') ORDER BY data_hora[0m
+  [1m[35mEXPLAIN (0.4ms)[0m  EXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 18:59:33') ORDER BY data_hora
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 18:59:33') ORDER BY data_hora
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra                       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where; Using filesort |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+1 row in set (0.00 sec)
+
+Completed 200 OK in 37582.2ms (Views: 0.5ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/line_history.json" for 127.0.0.1 at 2014-06-03 17:51:32 -0300
+
+ActionController::RoutingError (No route matches [GET] "/api/v1/dados_rj/line_history.json"):
+  actionpack (3.2.17) lib/action_dispatch/middleware/debug_exceptions.rb:21:in `call'
+  actionpack (3.2.17) lib/action_dispatch/middleware/show_exceptions.rb:56:in `call'
+  railties (3.2.17) lib/rails/rack/logger.rb:32:in `call_app'
+  railties (3.2.17) lib/rails/rack/logger.rb:16:in `block in call'
+  activesupport (3.2.17) lib/active_support/tagged_logging.rb:22:in `tagged'
+  railties (3.2.17) lib/rails/rack/logger.rb:16:in `call'
+  actionpack (3.2.17) lib/action_dispatch/middleware/request_id.rb:22:in `call'
+  rack (1.4.5) lib/rack/methodoverride.rb:21:in `call'
+  rack (1.4.5) lib/rack/runtime.rb:17:in `call'
+  activesupport (3.2.17) lib/active_support/cache/strategy/local_cache.rb:72:in `call'
+  rack (1.4.5) lib/rack/lock.rb:15:in `call'
+  actionpack (3.2.17) lib/action_dispatch/middleware/static.rb:63:in `call'
+  railties (3.2.17) lib/rails/engine.rb:484:in `call'
+  railties (3.2.17) lib/rails/application.rb:231:in `call'
+  rack (1.4.5) lib/rack/content_length.rb:14:in `call'
+  railties (3.2.17) lib/rails/rack/log_tailer.rb:17:in `call'
+  rack (1.4.5) lib/rack/handler/webrick.rb:59:in `service'
+  /home/gerente/.rvm/rubies/ruby-1.9.3-p545/lib/ruby/1.9.1/webrick/httpserver.rb:138:in `service'
+  /home/gerente/.rvm/rubies/ruby-1.9.3-p545/lib/ruby/1.9.1/webrick/httpserver.rb:94:in `run'
+  /home/gerente/.rvm/rubies/ruby-1.9.3-p545/lib/ruby/1.9.1/webrick/server.rb:191:in `block in start_thread'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/routing_error.erb within rescues/layout (6.3ms)
+
+
+Started GET "/api/v1/dados_rj/line_history.json" for 127.0.0.1 at 2014-06-03 17:52:37 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#line_history as JSON
+Completed 200 OK in 78.0ms (Views: 0.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/line_history.json?line=332" for 127.0.0.1 at 2014-06-03 17:52:47 -0300
+Processing by Api::V1::DadosRjController#line_history as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.4ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mDadoRj Load (18126.1ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mOrdem Load (70.9ms)[0m  SELECT `ordens`.* FROM `ordens` WHERE `ordens`.`id` IN (3346, 5139, 5228, 5670, 5859, 6127, 6213, 6283, 6499, 6974, 6975, 7029, 7110, 7164, 7167, 7170, 7296, 5752, 3065, 6918, 7264, 5143, 6578, 5042, 6574, 5669, 5750, 4444, 6844, 3899, 7262, 6129, 5753, 1112, 3159, 3364, 6840, 5342, 6922, 3023, 7215, 5676, 4628, 4552, 5667, 5440, 6909, 6908, 6766, 3467, 7263, 6906, 5448, 7107, 6772, 53, 6037, 6432, 4551, 3580, 508, 744, 6713, 5439, 6434, 7316, 7216, 5335, 6497, 4942, 6914, 3931, 7342, 5953, 6776, 4769, 4329, 6773, 7297, 863, 5339, 3880, 7022, 5015, 6851, 7269)
+  [1m[36mEXPLAIN (0.4ms)[0m  [1mEXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410[0m
+  [1m[35mEXPLAIN (12.2ms)[0m  EXPLAIN SELECT `ordens`.* FROM `ordens` WHERE `ordens`.`id` IN (3346, 5139, 5228, 5670, 5859, 6127, 6213, 6283, 6499, 6974, 6975, 7029, 7110, 7164, 7167, 7170, 7296, 5752, 3065, 6918, 7264, 5143, 6578, 5042, 6574, 5669, 5750, 4444, 6844, 3899, 7262, 6129, 5753, 1112, 3159, 3364, 6840, 5342, 6922, 3023, 7215, 5676, 4628, 4552, 5667, 5440, 6909, 6908, 6766, 3467, 7263, 6906, 5448, 7107, 6772, 53, 6037, 6432, 4551, 3580, 508, 744, 6713, 5439, 6434, 7316, 7216, 5335, 6497, 4942, 6914, 3931, 7342, 5953, 6776, 4769, 4329, 6773, 7297, 863, 5339, 3880, 7022, 5015, 6851, 7269)
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410
++----+-------------+----------+------+---------------+------+---------+------+----------+-------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where |
++----+-------------+----------+------+---------------+------+---------+------+----------+-------------+
+1 row in set (0.00 sec)
+
+EXPLAIN for: SELECT `ordens`.* FROM `ordens`  WHERE `ordens`.`id` IN (3346, 5139, 5228, 5670, 5859, 6127, 6213, 6283, 6499, 6974, 6975, 7029, 7110, 7164, 7167, 7170, 7296, 5752, 3065, 6918, 7264, 5143, 6578, 5042, 6574, 5669, 5750, 4444, 6844, 3899, 7262, 6129, 5753, 1112, 3159, 3364, 6840, 5342, 6922, 3023, 7215, 5676, 4628, 4552, 5667, 5440, 6909, 6908, 6766, 3467, 7263, 6906, 5448, 7107, 6772, 53, 6037, 6432, 4551, 3580, 508, 744, 6713, 5439, 6434, 7316, 7216, 5335, 6497, 4942, 6914, 3931, 7342, 5953, 6776, 4769, 4329, 6773, 7297, 863, 5339, 3880, 7022, 5015, 6851, 7269)
++----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+
+| id | select_type | table  | type  | possible_keys | key     | key_len | ref  | rows | Extra       |
++----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+
+|  1 | SIMPLE      | ordens | range | PRIMARY       | PRIMARY | 4       | NULL |   86 | Using where |
++----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+
+1 row in set (0.01 sec)
+
+Completed 200 OK in 41261.3ms (Views: 0.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/line_history.json?line=332" for 127.0.0.1 at 2014-06-03 17:55:06 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#line_history as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mDadoRj Load (36.5ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 LIMIT 5
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mOrdem Load (0.5ms)[0m  SELECT `ordens`.* FROM `ordens` WHERE `ordens`.`id` IN (3346, 5139, 5228, 5670, 5859)
+Completed 200 OK in 302.9ms (Views: 2.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/line_history.json?line=332" for 127.0.0.1 at 2014-06-03 17:56:53 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#line_history as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.2ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mDadoRj Load (0.1ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 LIMIT 5
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mOrdem Load (0.1ms)[0m  SELECT `ordens`.* FROM `ordens` WHERE `ordens`.`id` IN (3346, 5139, 5228, 5670, 5859)
+Completed 200 OK in 230.7ms (Views: 1.7ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/line_history.json?bus=C47590" for 127.0.0.1 at 2014-06-03 17:57:38 -0300
+Processing by Api::V1::DadosRjController#line_history as JSON
+  Parameters: {"bus"=>"C47590"}
+Completed 200 OK in 1.9ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/bus_history.json?bus=C47590" for 127.0.0.1 at 2014-06-03 17:57:57 -0300
+Processing by Api::V1::DadosRjController#bus_history as JSON
+  Parameters: {"bus"=>"C47590"}
+  [1m[36mOrdem Load (42.9ms)[0m  [1mSELECT `ordens`.* FROM `ordens` WHERE `ordens`.`ordem` = 'C47590' ORDER BY `ordens`.`id` DESC LIMIT 1[0m
+  [1m[35mDadoRj Load (23.7ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`ordem_id` = 3346 LIMIT 5
+  [1m[36mLinha Load (0.4ms)[0m  [1mSELECT `linhas`.* FROM `linhas` WHERE `linhas`.`id` IN (410)[0m
+Completed 200 OK in 77.7ms (Views: 2.0ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-03 18:00:42 -0300
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[35m (0.3ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mLinha Load (0.1ms)[0m  [1mSELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1[0m
+  [1m[35mCACHE (0.0ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mDadoRj Load (20793.0ms)[0m  [1mSELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 21:00:42') ORDER BY data_hora[0m
+  [1m[35mEXPLAIN (9.4ms)[0m  EXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 21:00:42') ORDER BY data_hora
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 21:00:42') ORDER BY data_hora
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra                       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where; Using filesort |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+1 row in set (0.01 sec)
+
+Completed 200 OK in 39102.1ms (Views: 0.5ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-03 19:08:51 -0300
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mDadoRj Load (21245.5ms)[0m  SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 22:08:51') ORDER BY data_hora
+  [1m[36mEXPLAIN (0.5ms)[0m  [1mEXPLAIN SELECT `dados_rj`.* FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 22:08:51') ORDER BY data_hora[0m
+EXPLAIN for: SELECT `dados_rj`.* FROM `dados_rj`  WHERE `dados_rj`.`linha_id` = 410 AND (data_hora BETWEEN '2014-04-21 00:00:00' AND '2014-04-27 22:08:51') ORDER BY data_hora
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows     | Extra                       |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+|  1 | SIMPLE      | dados_rj | ALL  | NULL          | NULL | NULL    | NULL | 42696534 | Using where; Using filesort |
++----+-------------+----------+------+---------------+------+---------+------+----------+-----------------------------+
+1 row in set (0.00 sec)
+
+Completed 200 OK in 39481.7ms (Views: 1313.9ms | ActiveRecord: 0.0ms)
+Connecting to database specified by database.yml
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:30:08 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.5ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.2ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+Completed 200 OK in 270.0ms (Views: 0.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:37:13 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.2ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+Completed 200 OK in 185.1ms (Views: 0.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:38:22 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m410 (0.3ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora 
+ FROM `dados_rj` 
+ WHERE `dados_rj`.`linha_id` = ? 
+ GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora)
+	 ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Mysql2::Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? 
+             GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora)
+	     ORDER BY DA' at line 3: SELECT avg(velocidade), count(*), data_hora 
+             FROM `dados_rj`  
+             WHERE `dados_rj`.`linha_id` = ? 
+             GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora)
+	     ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)
+Completed 200 OK in 170.9ms (Views: 0.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:39:00 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m410 (0.6ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = ? GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Mysql2::Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), ' at line 1: SELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = ? GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)
+Completed 200 OK in 176.5ms (Views: 0.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:45:39 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.2ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (53633.3ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 200 OK in 53852.3ms (Views: 0.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:48:14 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.2ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.2ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 200 OK in 174.6ms (Views: 0.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:48:20 -0300
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.1ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 200 OK in 3.5ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:49:19 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.6ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.2ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.2ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 500 Internal Server Error in 93.8ms
+
+ArgumentError (wrong number of arguments(1 for 0)):
+  app/models/busca_dado_rj.rb:10:in `initialize'
+  app/models/busca_dado_rj.rb:10:in `new'
+  app/models/busca_dado_rj.rb:10:in `block in media_dia_semana'
+  app/models/busca_dado_rj.rb:9:in `each'
+  app/models/busca_dado_rj.rb:9:in `media_dia_semana'
+  app/controllers/api/v1/dados_rj_controller.rb:22:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (2.1ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (1.8ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (22.1ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:51:19 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.2ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.2ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 500 Internal Server Error in 104.7ms
+
+NoMethodError (undefined method `data_hora' for [29.139116202946, 1222, 2014-04-20 00:00:04 UTC]:Array):
+  app/controllers/api/v1/dados_rj_controller.rb:25:in `block in from_current_week'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `each'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (1.2ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (0.8ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (37.1ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:52:02 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.2ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.1ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 500 Internal Server Error in 107334.0ms
+
+NoMethodError (undefined method `data_hora' for [29.139116202946, 1222, 2014-04-20 00:00:04 UTC]:Array):
+  app/controllers/api/v1/dados_rj_controller.rb:25:in `block in from_current_week'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `each'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (1.8ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (1.4ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (11.6ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:55:26 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.2ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.2ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 500 Internal Server Error in 119.0ms
+
+NoMethodError (undefined method `data_hora' for [29.139116202946, 1222, 2014-04-20 00:00:04 UTC]:Array):
+  app/controllers/api/v1/dados_rj_controller.rb:25:in `block in from_current_week'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `each'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (1.2ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (0.8ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (36.5ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:56:13 -0300
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[35m (0.3ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mLinha Load (0.1ms)[0m  [1mSELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1[0m
+  [1m[35m (0.1ms)[0m  SELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)
+Completed 500 Internal Server Error in 19330.7ms
+
+NoMethodError (undefined method `data_hora' for [29.139116202946, 1222, 2014-04-20 00:00:04 UTC]:Array):
+  app/controllers/api/v1/dados_rj_controller.rb:27:in `block in from_current_week'
+  app/controllers/api/v1/dados_rj_controller.rb:26:in `each'
+  app/controllers/api/v1/dados_rj_controller.rb:26:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (2.6ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (1.3ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (11.1ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:57:05 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.5ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.2ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 500 Internal Server Error in 140.9ms
+
+NoMethodError (undefined method `velocidade' for #<BuscaDadoRj:0x0000000547f5b8>):
+  app/controllers/api/v1/dados_rj_controller.rb:27:in `block in from_current_week'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `each'
+  app/controllers/api/v1/dados_rj_controller.rb:24:in `from_current_week'
+
+
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_trace.erb (1.2ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (0.8ms)
+  Rendered /home/gerente/.rvm/gems/ruby-1.9.3-p545@busData/gems/actionpack-3.2.17/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (36.8ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 15:57:50 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (0.3ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.1ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.2ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` WHERE `dados_rj`.`linha_id` = 410 GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 200 OK in 256.4ms (Views: 2.0ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-04 17:51:16 -0300
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[35m (0.5ms)[0m  SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()
+  [1m[36mLinha Load (0.1ms)[0m  [1mSELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1[0m
+  [1m[35m (75077.8ms)[0m  SELECT avg(velocidade), count(*), data_hora FROM `dados_rj` GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)
+Completed 200 OK in 75112.3ms (Views: 3.6ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/v1/dados_rj/from_current_week.json?line=332" for 127.0.0.1 at 2014-06-09 15:25:35 -0300
+Connecting to database specified by database.yml
+Processing by Api::V1::DadosRjController#from_current_week as JSON
+  Parameters: {"line"=>"332"}
+  [1m[36m (7.0ms)[0m  [1mSELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()[0m
+  [1m[35mLinha Load (0.2ms)[0m  SELECT `linhas`.* FROM `linhas` WHERE `linhas`.`linha` = '332' ORDER BY `linhas`.`id` DESC LIMIT 1
+  [1m[36m (0.2ms)[0m  [1mSELECT avg(velocidade), count(*), data_hora FROM `dados_rj` GROUP BY DAYOFWEEK(data_hora), HOUR(data_hora) ORDER BY DAYOFWEEK(data_hora), HOUR(data_hora)[0m
+Completed 200 OK in 282.3ms (Views: 2.1ms | ActiveRecord: 0.0ms)
