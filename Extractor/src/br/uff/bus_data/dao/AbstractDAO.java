@@ -41,7 +41,7 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         }
         attributes += "created_at , updated_at)";
 
-        String query = "INSERT INTO " + getTableName() + " " + attributes + " VALUES ";
+        String query = "INSERT IGNORE INTO " + getTableName() + " " + attributes + " VALUES ";
         String values = "(";
         for (Map<String, String> map : params) {
             values = "(";
@@ -71,7 +71,7 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         }
         attributes += "created_at , updated_at)";
 
-        String query = "INSERT INTO " + getTableName() + " " + attributes + " VALUES ";
+        String query = "INSERT IGNORE INTO " + getTableName() + " " + attributes + " VALUES ";
         String values = "(";
         for (String attr : attrs) {
             values += params.get(attr) + " , ";
@@ -154,3 +154,5 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         this.stmt = st;
     }
 }
+
+

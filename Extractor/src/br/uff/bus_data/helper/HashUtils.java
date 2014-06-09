@@ -46,15 +46,12 @@ public class HashUtils {
         return ordensHash;
     }
     
-    public static Map<Long, Position> loadPosicoes(Statement stmt) throws SQLException {
-        Map<Long, Position> dadosHash = new HashMap<Long, Position>();
-//        DadoRJDAO dadoRJDao = new DadoRJDAO();
-//        dadoRJDao.setStatement(stmt);
-//        List<DadoRJ> listDados = dadoRJDao.all();
-//        for (DadoRJ dado : listDados) {
-//            dadosHash.put(dado.getOrdemId(), dado.getPosition());
-//        }
-        return dadosHash;
+    public static Map<String, DadoRJ> loadPosicoes(Statement stmt) throws SQLException {
+        DadoRJDAO dadoRJDao = new DadoRJDAO();
+        dadoRJDao.setStatement(stmt);
+        return dadoRJDao.selectUltimasPosicoes();
     }
 
 }
+
+

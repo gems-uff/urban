@@ -6,7 +6,6 @@
 package br.uff.bus_data.dao;
 
 import br.uff.bus_data.helper.Constants;
-import br.uff.bus_data.models.Coleta;
 import br.uff.bus_data.models.DadoRJ;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -69,4 +69,24 @@ public class DadoRJDAO extends AbstractDAO<DadoRJ> {
         attrs.add("velocidade");
         return attrs;
     }
+
+    public HashMap<String, DadoRJ> selectUltimasPosicoes() throws SQLException {
+        HashMap<String, DadoRJ> map = new HashMap<String, DadoRJ>();
+        String query = "SELECT * FROM ";
+        query += getTableName();
+        query += " d1 INNER JOIN (SELECT di.ordem_id, MAX(di.id) AS ultimaPosicaoId"
+                + " FROM dados_rj di GROUP BY di.ordem_id) d2"
+                + " ON (d1.id = d2.ultimaPosicaoId)"
+                + " INNER JOIN ordens o"
+                + " ON (o.id = d1.ordem_id)";
+//        System.out.println("query: " + query);
+
+        ResultSet rs = stmt.executeQuery(query);
+        while (rs.next()) {
+            map.put(rs.getString("ordem"), getFromResultSet(rs));
+        }
+        return map;
+    }
 }
+
+

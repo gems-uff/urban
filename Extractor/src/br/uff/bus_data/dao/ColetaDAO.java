@@ -66,3 +66,5 @@ public class ColetaDAO extends AbstractDAO<Coleta> {
         return attrs;
     }
 }
+
+

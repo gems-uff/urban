@@ -11,9 +11,10 @@ package br.uff.bus_data.helper;
  * @author schettino
  */
 public class DBConnection {
-    public static final String JDBC = "";
-    public static final String DATABASE = "";
-    public static final String USER = "";
-    public static final String PASSWORD = "";
-    
+    public static final String JDBC = "mysql";
+    public static final String DATABASE = "//localhost/bus_data_java";
+    public static final String USER = "root";
+    public static final String PASSWORD = "tzzk7662";
+
 }
+

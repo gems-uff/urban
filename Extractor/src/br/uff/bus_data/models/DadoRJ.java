@@ -5,11 +5,15 @@
  */
 package br.uff.bus_data.models;
 
+import br.uff.bus_data.Main;
 import br.uff.bus_data.helper.Constants;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,10 +21,10 @@ import java.util.Map;
  */
 public class DadoRJ implements Comparable<DadoRJ>, Mappable<String, String> {
 
-    long id;
-    long coletaId;
-    long linhaId;
-    long ordemId;
+    Long id;
+    Long coletaId;
+    Long linhaId;
+    Long ordemId;
     Date dataHora;
     float latitude;
     float longitude;
@@ -117,4 +121,52 @@ public class DadoRJ implements Comparable<DadoRJ>, Mappable<String, String> {
         map.put("data_hora", "'" + dt.format(this.dataHora) + "'");
         return map;
     }
+
+    public boolean foiAtualizado(DadoRJ novo) {
+        if (this.dataHora.compareTo(novo.dataHora) >= 0) {
+            return false;
+        }
+        if ((this.latitude != novo.latitude) || (this.longitude != novo.longitude)) {
+            return true; // Mudou a posição
+        }
+        if (this.linhaId != novo.linhaId) {
+            return true; // Mudou de linha
+        }
+        if (this.velocidade != novo.velocidade) {
+            return true;
+        }
+        return false;
+    }
+
+    public static DadoRJ fromJsonFile(ArrayList<Object> params, Long linhaId, Long ordemId, Long coletaId) {
+        DadoRJ dado = new DadoRJ();
+        dado.coletaId = coletaId;
+        dado.ordemId = ordemId;
+        dado.linhaId = linhaId;
+        SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
+        String data = String.valueOf(params.get(Constants.INDEX_DATA_HORA));
+        Date date = null;
+        if (!data.isEmpty()) {
+            try {
+                date = dt.parse(data);
+            } catch (java.text.ParseException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        dado.dataHora = date;
+        dado.latitude = Float.valueOf(String.valueOf(params.get(Constants.INDEX_LATITUDE)));
+        dado.longitude = Float.valueOf(String.valueOf(params.get(Constants.INDEX_LONGITUDE)));
+        dado.velocidade = Float.valueOf(String.valueOf(params.get(Constants.INDEX_VELOCIDADE)));
+        return dado;
+    }
+    
+    @Override
+    public String toString(){
+        return "Latitude: " + this.latitude + "; Longitude: " + this.longitude
+                + "; velocidade: " + this.velocidade + "; dataHora: "
+                + this.dataHora + "; Ordem: " + this.ordemId + "; Linha: "
+                + this.linhaId + "; Coleta: " + this.coletaId;
+    }
 }
+
+

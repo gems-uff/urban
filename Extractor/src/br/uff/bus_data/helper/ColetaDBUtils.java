@@ -32,7 +32,7 @@ public class ColetaDBUtils {
     }
 
     public static void finalizaColetaComSucesso(ColetaDAO dao, Long coletaId) throws SQLException {
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<String, String>();
         SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date d = new Date();
         params.put("data_hora_fim", "'" + dt.format(d) + "'");
@@ -41,7 +41,7 @@ public class ColetaDBUtils {
     }
 
     public static void finalizaColetaComErros(ColetaDAO dao, Long coletaId, String erros) throws SQLException {
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<String, String>();
         SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date d = new Date();
         params.put("data_hora_fim", "'" + dt.format(d) + "'");
@@ -51,3 +51,5 @@ public class ColetaDBUtils {
     }
 
 }
+
+

@@ -17,3 +17,5 @@ import java.util.Map;
 public interface Mappable<T1, T2> {
     public Map<T1,T2> getMap();
 }
+
+

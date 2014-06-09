@@ -93,3 +93,5 @@ public class Coleta implements Comparable<Coleta>, Mappable<String, String> {
         return map;
     }
 }
+
+
