@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.uff.bus_data.helper;
+package br.uff.bus_data.dbHelpers;
 
 import br.uff.bus_data.dao.ColetaDAO;
+import br.uff.bus_data.helper.Constants;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author schettino
  */
-public class DadoRJ implements Comparable<DadoRJ>, Mappable<String, String> {
+public class Descarte implements Mappable<String, String> {
 
     Long id;
     Long coletaId;
@@ -29,6 +29,7 @@ public class DadoRJ implements Comparable<DadoRJ>, Mappable<String, String> {
     float latitude;
     float longitude;
     float velocidade;
+    String motivo;
 
     public long getId() {
         return id;
@@ -99,12 +100,12 @@ public class DadoRJ implements Comparable<DadoRJ>, Mappable<String, String> {
         return p;
     }
 
-    @Override
-    public int compareTo(DadoRJ o) {
-        if ((this.dataHora.compareTo(o.dataHora) == 0) && (this.ordemId == o.ordemId)) {
-            return 0;
-        }
-        return -1;
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
     }
 
     @Override
@@ -119,70 +120,18 @@ public class DadoRJ implements Comparable<DadoRJ>, Mappable<String, String> {
         map.put("longitude", String.valueOf(this.longitude));
         map.put("velocidade", String.valueOf(this.velocidade));
         map.put("data_hora", "'" + dt.format(this.dataHora) + "'");
+        map.put("motivo", "'" + dt.format(this.motivo) + "'");
         return map;
     }
-
-    public boolean foiAtualizado(DadoRJ novo, Descarte descarte) {
-        if (this.dataHora.compareTo(novo.dataHora) >= 0) {
-            descarte.setMotivo("Dado anterior ao atual");
-            return false;
-        }
-        if ((this.latitude != novo.latitude) || (this.longitude != novo.longitude)) {
-            return true; // Mudou a posição
-        }
-        if (this.linhaId != novo.linhaId) {
-            return true; // Mudou de linha
-        }
-        if (this.velocidade != novo.velocidade) {
-            return true;
-        }
-        descarte.setMotivo("Dado não foi atualizado");
-        return false;
-    }
-
-    public String motivoDescarte(DadoRJ novo) {
-        if (this.dataHora.compareTo(novo.dataHora) >= 0) {
-            return "Dado anterior ao atual";
-        }
-        if ((this.latitude != novo.latitude) || (this.longitude != novo.longitude)) {
-            return null; // Mudou a posição
-        }
-        if (this.linhaId != novo.linhaId) {
-            return null; // Mudou de linha
-        }
-        if (this.velocidade != novo.velocidade) {
-            return null;
-        }
-        return "Dado não foi atualizado";
-    }
-
-    public static DadoRJ fromJsonFile(ArrayList<Object> params, Long linhaId, Long ordemId, Long coletaId) {
-        DadoRJ dado = new DadoRJ();
-        dado.coletaId = coletaId;
-        dado.ordemId = ordemId;
-        dado.linhaId = linhaId;
-        SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        String data = String.valueOf(params.get(Constants.INDEX_DATA_HORA));
-        Date date = null;
-        if (!data.isEmpty()) {
-            try {
-                date = dt.parse(data);
-            } catch (java.text.ParseException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        dado.dataHora = date;
-        dado.latitude = Float.valueOf(String.valueOf(params.get(Constants.INDEX_LATITUDE)));
-        dado.longitude = Float.valueOf(String.valueOf(params.get(Constants.INDEX_LONGITUDE)));
-        dado.velocidade = Float.valueOf(String.valueOf(params.get(Constants.INDEX_VELOCIDADE)));
-        return dado;
-    }
-
+    
     @Override
-    public String toString() {
+    public String toString(){
         return "Latitude: " + this.latitude + "; Longitude: " + this.longitude
                 + "; velocidade: " + this.velocidade + "; dataHora: "
                 + this.dataHora + "; Ordem: " + this.ordemId + "; Linha: "
-                + this.linhaId + "; Coleta: " + this.coletaId;
+                + this.linhaId + "; Coleta: " + this.coletaId + "; Motivo: "
+                + this.motivo;
     }
 }
+
+

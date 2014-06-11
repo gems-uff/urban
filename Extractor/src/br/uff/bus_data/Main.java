@@ -7,9 +7,14 @@ package br.uff.bus_data;
 
 import br.uff.bus_data.dao.ColetaDAO;
 import br.uff.bus_data.dao.DadoRJDAO;
+import br.uff.bus_data.dao.DescarteDAO;
 import br.uff.bus_data.dao.LinhaDAO;
 import br.uff.bus_data.dao.OrdemDAO;
-import br.uff.bus_data.helper.ColetaDBUtils;
+import br.uff.bus_data.dbHelpers.ColetaDBUtils;
+import br.uff.bus_data.dbHelpers.DadoRJDBUtils;
+import br.uff.bus_data.dbHelpers.IndexesDBUtils;
+import br.uff.bus_data.dbHelpers.LinhaDBUtils;
+import br.uff.bus_data.dbHelpers.OrdemDBUtils;
 import br.uff.bus_data.helper.Constants;
 import br.uff.bus_data.helper.DBConnection;
 import br.uff.bus_data.helper.DeleteDirectory;
@@ -22,10 +27,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -60,35 +63,25 @@ public class Main {
             Map<String, Long> linhasHash = HashUtils.loadLinhas(stmt); // entrada: numero da linha; saída: id da linha
             Map<String, Long> ordensHash = HashUtils.loadOrdens(stmt);// entrada: ordem do ônibus; saída: id da ordem
             Map<String, DadoRJ> dadosHash = HashUtils.loadPosicoes(stmt);// entrada: ordem do ônibus; saída: ultima posicao do onibus
+
             ColetaDAO coletaDao = new ColetaDAO();
             coletaDao.setStatement(stmt);
-
             LinhaDAO linhaDao = new LinhaDAO();
             linhaDao.setStatement(stmt);
             OrdemDAO ordemDao = new OrdemDAO();
             ordemDao.setStatement(stmt);
             DadoRJDAO dadoRJDao = new DadoRJDAO();
             dadoRJDao.setStatement(stmt);
-            System.out.println("Removing indexes");
-            stmt.execute("DROP INDEX index_ordens_on_ordem ON ordens");
-            stmt.execute("DROP INDEX index_linhas_on_linha ON linhas");
-            stmt.execute("DROP INDEX index_coletas_on_data_hora_inicio_and_filename ON coletas");
-            stmt.execute("DROP INDEX index_dados_rj_on_data_hora_and_ordem_id ON dados_rj");
-            System.out.println("Removing foreign keys");
-            stmt.execute("ALTER TABLE dados_rj DROP FOREIGN KEY fk_dados_rj_coleta_id");
-            stmt.execute("ALTER TABLE dados_rj DROP FOREIGN KEY fk_dados_rj_linha_id");
-            stmt.execute("ALTER TABLE dados_rj DROP FOREIGN KEY fk_dados_rj_ordem_id");
-            stmt.execute("DROP INDEX fk__dados_rj_linha_id ON dados_rj");
-            stmt.execute("DROP INDEX fk__dados_rj_coleta_id ON dados_rj");
-            stmt.execute("DROP INDEX fk__dados_rj_ordem_id ON dados_rj");
-            System.out.println("Starting");
+            DescarteDAO descarteDao = new DescarteDAO();
+            descarteDao.setStatement(stmt);
+
+            IndexesDBUtils.dropIndexes(stmt);
 
             File currentDirFile = new File("");
             String projRoot = currentDirFile.getAbsolutePath();
             String zipsPath = projRoot + "/zips";
             File[] zips = FileFinder.finder(zipsPath, ".zip");
             Arrays.sort(zips);
-
 
             for (File zip : zips) {
                 String zipName = zip.getName().replaceFirst("[.][^.]+$", "");
@@ -109,6 +102,8 @@ public class Main {
                             linhaDao.setStatement(stmt);
                             ordemDao.setStatement(stmt);
                             dadoRJDao.setStatement(stmt);
+                            descarteDao.setStatement(stmt);
+
                             coletaId = coletaDao.insert(ColetaDBUtils.insertDefaultParams(file.getName()));
                             JSONObject rootObject = (JSONObject) parser.parse(new FileReader(file.getAbsoluteFile()));
                             ArrayList<String> colunas = (ArrayList<String>) rootObject.get(Constants.KEY_COLUNAS);
@@ -121,64 +116,27 @@ public class Main {
                             ArrayList<Object> dados = (ArrayList<Object>) rootObject.get(Constants.KEY_DADOS);
                             for (int i = 0; i < dados.size(); i++) {
                                 ArrayList<Object> dado = (ArrayList<Object>) dados.get(i);
-
-                                HashMap<String, String> params = new HashMap<String, String>();
-
-                                String linha = String.valueOf(dado.get(Constants.INDEX_LINHA));
-                                linhaId = null;
-
-                                if (!linha.isEmpty()) {
-                                    linha = linha.split("\\.")[0];
-                                    linhaId = linhasHash.get(linha);
-                                    if (linhaId == null) {
-                                        params.clear();
-                                        params.put(Constants.KEY_LINHA, "'" + linha + "'");
-                                        linhaId = linhaDao.insert(params);
-                                        linhasHash.put(linha, linhaId);
-                                    }
-
-                                }
+                                linhaId = LinhaDBUtils.insereLinha(linhaDao,
+                                        String.valueOf(dado.get(Constants.INDEX_LINHA)),
+                                        linhasHash);
 
                                 String ordem = String.valueOf(dado.get(Constants.INDEX_ORDEM));
-                                ordemId = null;
+                                ordemId = OrdemDBUtils.insereOrdem(ordemDao, ordem,
+                                        ordensHash);
 
-                                if (!ordem.isEmpty()) {
-                                    ordemId = ordensHash.get(ordem);
-                                    if (ordemId == null) {
-                                        params.clear();
-                                        params.put(Constants.KEY_ORDEM, "'" + ordem + "'");
-                                        ordemId = ordemDao.insert(params);
-                                        ordensHash.put(ordem, ordemId);
-                                    }
-
-                                }
                                 DadoRJ dadoAtual = dadosHash.get(ordem);
                                 DadoRJ novoDado = DadoRJ.fromJsonFile(dado, linhaId, ordemId, coletaId);
-                                if ((dadoAtual == null) || (dadoAtual.foiAtualizado(novoDado))) {
-                                    params.clear();
-                                    SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
-                                    SimpleDateFormat dt2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    String data = String.valueOf(dado.get(Constants.INDEX_DATA_HORA));
-                                    if (!data.isEmpty()) {
-                                        try {
-                                            Date date = dt.parse(data);
-                                            data = dt2.format(date);
-                                        } catch (java.text.ParseException ex) {
-                                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
+                                HashMap<String, String> params = DadoRJDBUtils.geraParams(dado, linhaId, ordemId, coletaId);
+
+                                if ((dadoAtual == null)) {
+                                    String motivoDescarte = dadoAtual.motivoDescarte(novoDado);
+                                    if (motivoDescarte == null) {
+                                        dadoRJDao.insert(params);
+                                        dadosHash.put(ordem, novoDado);
+                                    } else {
+                                        params.put("motivo", "'" + motivoDescarte + "'");
+                                        descarteDao.insert(params);
                                     }
-                                    params.clear();
-                                    params.put("linha_id", String.valueOf(linhaId));
-                                    params.put("ordem_id", String.valueOf(ordemId));
-                                    params.put("coleta_id", String.valueOf(coletaId));
-                                    params.put("data_hora", "'" + data + "'");
-                                    params.put("latitude", String.valueOf(dado.get(Constants.INDEX_LATITUDE)));
-                                    params.put("longitude", String.valueOf(dado.get(Constants.INDEX_LONGITUDE)));
-                                    params.put("velocidade", String.valueOf(dado.get(Constants.INDEX_VELOCIDADE)));
-
-                                    dadoRJDao.insert(params);
-                                    dadosHash.put(ordem, novoDado);
-
                                 }
                             }
 
@@ -204,30 +162,8 @@ public class Main {
                     Logger.getLogger(UnZip.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            IndexesDBUtils.createIndexes(stmt);
 
-            System.out.println("Re-creating indexes");
-            stmt.execute("CREATE UNIQUE INDEX index_ordens_on_ordem ON ordens (ordem)");
-            System.out.println("Index ordens OK");
-            stmt.execute("CREATE UNIQUE INDEX index_linhas_on_linha ON linhas (linha)");
-            System.out.println("Index linhas OK");
-            stmt.execute("CREATE UNIQUE INDEX index_coletas_on_data_hora_inicio_and_filename ON coletas (data_hora_inicio, filename)");
-            System.out.println("Index coletas OK");
-            stmt.execute("CREATE UNIQUE INDEX index_dados_rj_on_data_hora_and_ordem_id ON dados_rj (data_hora, ordem_id)");
-            System.out.println("Index dados OK");
-            System.out.println("Re-Creating FKs");
-            stmt.execute("ALTER TABLE dados_rj ADD FOREIGN KEY (coleta_id) REFERENCES coletas(id)");
-            System.out.println("FK dados_rj coleta_id OK");
-            stmt.execute("ALTER TABLE dados_rj ADD FOREIGN KEY (linha_id) REFERENCES linhas(id)");
-            System.out.println("FK dados_rj linha_id OK");
-            stmt.execute("ALTER TABLE dados_rj ADD FOREIGN KEY (ordem_id) REFERENCES ordens(id)");
-            System.out.println("FK dados_rj ordem_id OK");
-            System.out.println("Re-Creating FKs Indexes");
-            stmt.execute("CREATE INDEX fk__dados_rj_ordem_id ON dados_rj (ordem_id)");
-            System.out.println("FK index dados_rj ordem_id OK");
-            stmt.execute("CREATE INDEX fk__dados_rj_linha_id ON dados_rj (linha_id)");
-            System.out.println("FK index dados_rj linha_id OK");
-            stmt.execute("CREATE INDEX fk__dados_rj_coleta_id ON dados_rj (coleta_id)");
-            System.out.println("FK index dados_rj coleta_id OK");
             stmt.close();
             con.close();
         } catch (SQLException e) {
@@ -237,5 +173,3 @@ public class Main {
         }
     }
 }
-
-
