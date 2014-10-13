@@ -6,7 +6,7 @@
 package br.uff.bus_data.dao;
 
 import br.uff.bus_data.helper.Constants;
-import br.uff.bus_data.models.Descarte;
+import br.uff.bus_data.models.Disposal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -14,61 +14,64 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.postgis.PGgeometry;
 
 /**
  *
  * @author schettino
  */
-public class DescarteDAO extends AbstractDAO<Descarte> {
+public class DisposalDAO extends AbstractDAO<Disposal> {
 
     @Override
-    public Descarte getFromResultSet(ResultSet rs) throws SQLException {
+    public Disposal getFromResultSet(ResultSet rs) throws SQLException {
 
         SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
-        Descarte descarte = new Descarte();
-        Date dataHora = null;
+        Disposal disposal = new Disposal();
+        Date time = null;
         try {
-            dataHora = dt.parse(rs.getString("data_hora"));
+            time = dt.parse(rs.getString("time"));
         } catch (ParseException ex) {
         }
         int i = rs.getInt("id");
-        int coletaId = rs.getInt("coleta_id");
-        int linhaId = rs.getInt("linha_id");
-        int ordemId = rs.getInt("ordem_id");
-        float latitude = rs.getFloat("latitude");
-        float longitude = rs.getFloat("longitude");
-        float velocidade = rs.getFloat("velocidade");
-        String motivo = rs.getString("motivo");
+        long loadedFileId = rs.getLong("loaded_file_id");
+        long lineId = rs.getLong("line_id");
+        long busId = rs.getLong("bus_id");
+        long lastPositionId = rs.getLong("last_postion_id");
+        PGgeometry position =  new PGgeometry(rs.getObject("position").toString());
+        float speed = rs.getFloat("speed");
+        String disposal_reason = rs.getString("disposal_reason");
 
-        descarte.setDataHora(dataHora);
-        descarte.setId(i);
-        descarte.setColetaId(coletaId);
-        descarte.setLinhaId(linhaId);
-        descarte.setOrdemId(ordemId);
-        descarte.setLatitude(latitude);
-        descarte.setLongitude(longitude);
-        descarte.setVelocidade(velocidade);
-        descarte.setMotivo(motivo);
+        disposal.setTime(time);
+        disposal.setId(i);
+        disposal.setLoadedFileId(loadedFileId);
+        disposal.setLineId(lineId);
+        disposal.setBusId(busId);
+        disposal.setPosition(position);
+        disposal.setSpeed(speed);
+        disposal.setLastPositionId(lastPositionId);
+        disposal.setDisposalReason(disposal_reason);
 
-        return descarte;
+        return disposal;
     }
 
     @Override
     public String getTableName() {
-        return "descartes";
+        return "disposals";
     }
 
     @Override
     public List<String> getAttributes() {
         ArrayList<String> attrs = new ArrayList<String>();
-        attrs.add("data_hora");
-        attrs.add("coleta_id");
-        attrs.add("linha_id");
-        attrs.add("ordem_id");
-        attrs.add("latitude");
-        attrs.add("longitude");
-        attrs.add("velocidade");
-        attrs.add("motivo");
+        attrs.add("time");
+        attrs.add("loaded_file_id");
+        attrs.add("line_id");
+        attrs.add("bus_id");
+        attrs.add("last_postion_id");
+        attrs.add("position");
+//        attrs.add("latitude");
+//        attrs.add("longitude");
+        attrs.add("speed");
+        attrs.add("disposal_reason");
         return attrs;
     }
 

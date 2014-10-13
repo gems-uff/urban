@@ -5,7 +5,7 @@
  */
 package br.uff.bus_data.dao;
 
-import br.uff.bus_data.models.Linha;
+import br.uff.bus_data.models.Line;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,25 +15,25 @@ import java.util.List;
  *
  * @author schettino
  */
-public class LinhaDAO extends AbstractDAO<Linha> {
+public class LineDAO extends AbstractDAO<Line> {
 
     @Override
-    public Linha getFromResultSet(ResultSet rs) throws SQLException {
-        String num = rs.getString("linha");
+    public Line getFromResultSet(ResultSet rs) throws SQLException {
+        String num = rs.getString("line_number");
         int i = rs.getInt("id");
-        return new Linha(num, i);
+        return new Line(num, i);
     }
     
     
     @Override
     public  String getTableName() {
-        return "linhas";
+        return "lines";
     }
     
     @Override
     public  List<String> getAttributes(){
         ArrayList<String> attrs = new ArrayList<String>();
-        attrs.add("linha");
+        attrs.add("line_number");
         return attrs;
     }
 }

@@ -8,23 +8,11 @@ package br.uff.bus_data.helper;
  *
  * @author gerente
  */
-import java.io.File;
-import java.io.FilenameFilter;
 
-public class FileFinder {
+public class CSVConstants {
+    
+    public static final String CSV_SEPARATOR = ",";
+    public static final String[] STOPS_COLUMNS = {"linha","descricao","agencia","sequencia", "latitude","longitude"};
+    public static final String[] POSITIONS_COLUMNS = {"linha","descricao","agencia","sequencia", "shape_id", "latitude","longitude"};
 
-
-    public static File[] finder(String dirName, final String extension) {
-        File dir = new File(dirName);
-
-        return dir.listFiles(new FilenameFilter() {
-
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(extension);
-            }
-        });
-
-    }
 }
-
-

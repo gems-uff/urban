@@ -51,7 +51,7 @@ public class DeleteDirectory {
         } else {
             //if file, then delete it
             file.delete();
-            System.out.println("File is deleted : " + file.getAbsolutePath());
+//            System.out.println("File is deleted : " + file.getAbsolutePath());
         }
     }
 }

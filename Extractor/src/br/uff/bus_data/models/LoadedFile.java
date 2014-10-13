@@ -15,15 +15,28 @@ import java.util.Map;
  *
  * @author schettino
  */
-public class Coleta implements Comparable<Coleta>, Mappable<String, String> {
+public class LoadedFile implements Comparable<LoadedFile>, Mappable<String, String> {
 
     long id;
     int status;
-    Date dataHoraFim;
-    Date dataHoraInicio;
-    String erros;
+    int type;
+    Date endTime;
+    Date startTime;
+    String errors;
     String filename;
+    
+    public static final int TYPE_BUS_POSITIONS = 0;
+    public static final int TYPE_LINE_STOPS = 1;
+    public static final int TYPE_LINE_POSITIONS = 2;
 
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
     public String getFilename() {
         return filename;
     }
@@ -48,33 +61,33 @@ public class Coleta implements Comparable<Coleta>, Mappable<String, String> {
         this.status = status;
     }
 
-    public Date getDataHoraFim() {
-        return dataHoraFim;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setDataHoraFim(Date dataHoraFim) {
-        this.dataHoraFim = dataHoraFim;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
-    public Date getDataHoraInicio() {
-        return dataHoraInicio;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setDataHoraInicio(Date dataHoraInicio) {
-        this.dataHoraInicio = dataHoraInicio;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public String getErros() {
-        return erros;
+    public String getErrors() {
+        return errors;
     }
 
-    public void setErros(String erros) {
-        this.erros = erros;
+    public void setErrors(String errors) {
+        this.errors = errors;
     }
 
     @Override
-    public int compareTo(Coleta o) {
-        if ((this.dataHoraInicio.compareTo(o.dataHoraInicio) == 0) && (this.filename.equals(o.filename))) {
+    public int compareTo(LoadedFile o) {
+        if ((this.startTime.compareTo(o.startTime) == 0) && (this.filename.equals(o.filename))) {
             return 0;
         }
         return -1;
@@ -86,9 +99,10 @@ public class Coleta implements Comparable<Coleta>, Mappable<String, String> {
         SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
         map.put("id", String.valueOf(this.id));
         map.put("status", String.valueOf(this.status));
-        map.put("data_hora_fim", "'" + dt.format(this.dataHoraFim) + "'");
-        map.put("data_hora_inicio", "'" + dt.format(this.dataHoraInicio) + "'");
-        map.put("erros", "'" + erros + "'");
+        map.put("type", String.valueOf(this.type));
+        map.put("end_time", "'" + dt.format(this.endTime) + "'");
+        map.put("start_time", "'" + dt.format(this.startTime) + "'");
+        map.put("errors", "'" + errors + "'");
         map.put("filename", "'" + filename + "'");
         return map;
     }

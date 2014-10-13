@@ -34,27 +34,41 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
     public abstract List<String> getAttributes();
 
     public List<Long> insert(List<Map<String, String>> params) throws SQLException {
+        if (params.isEmpty()) {
+            return null;
+        }
+        
         String attributes = "(";
         List<String> attrs = getAttributes();
         for (String attr : attrs) {
             attributes += attr + " , ";
         }
         attributes += "created_at , updated_at)";
+                Date d = new Date();
+        SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
+        String date = dt.format(d);
 
-        String query = "INSERT IGNORE INTO " + getTableName() + " " + attributes + " VALUES ";
+        StringBuilder query = new StringBuilder();
+        query.append("INSERT INTO ").append(getTableName()).append(" ").append(attributes).append(" VALUES ");
         String values = "(";
+        for (String attr : attrs) {
+            values += params.get(0).get(attr) + " , ";
+        }
+
+        values += "'" + date + "'" + " , " + "'" + date + "' )";
+        query.append(values);
+        params.remove(0);
+
         for (Map<String, String> map : params) {
-            values = "(";
+            values = ", (";
             for (String attr : attrs) {
                 values += map.get(attr) + " , ";
             }
-            Date d = new Date();
-            SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
-            values += "'" + dt.format(d) + "'" + " , " + "'" + dt.format(d) + "' ),";
+            values += "'" + date + "'" + " , " + "'" + date + "' )";
+            query.append(values);
         }
-        values = values.substring(0, values.lastIndexOf(","));
-        query += values;
-        stmt.executeUpdate(query, new String[] {"id"});
+        
+        stmt.executeUpdate(query.toString(), new String[]{"id"});
         ResultSet rs = stmt.getGeneratedKeys();
         ArrayList<Long> ids = new ArrayList<Long>();
         while (rs.next()) {
@@ -71,7 +85,7 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         }
         attributes += "created_at , updated_at)";
 
-        String query = "INSERT IGNORE INTO " + getTableName() + " " + attributes + " VALUES ";
+        String query = "INSERT INTO " + getTableName() + " " + attributes + " VALUES ";
         String values = "(";
         for (String attr : attrs) {
             values += params.get(attr) + " , ";
@@ -81,7 +95,8 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         values += "'" + dt.format(d) + "'" + " , " + "'" + dt.format(d) + "' ),";
         values = values.substring(0, values.lastIndexOf(","));
         query += values;
-        int size = stmt.executeUpdate(query, new String[] {"id"});
+
+        int size = stmt.executeUpdate(query, new String[]{"id"});
         ResultSet rs = stmt.getGeneratedKeys();
         if (size != 1) {
             return null;
@@ -154,5 +169,3 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         this.stmt = st;
     }
 }
-
-

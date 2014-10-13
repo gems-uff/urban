@@ -5,33 +5,35 @@
  */
 package br.uff.bus_data.dbHelpers;
 
-import br.uff.bus_data.dao.LinhaDAO;
+import br.uff.bus_data.dao.LineDAO;
 import br.uff.bus_data.helper.Constants;
+import br.uff.bus_data.models.Line;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  *
  * @author schettino
  */
-public class LinhaDBUtils {
+public class LineDBUtils {
 
-    public static Long insereLinha(LinhaDAO dao, String linha, Map<String, Long> linhasHash) throws SQLException {
+    public static Long findOrInsertLine(LineDAO lineDao, String line, Map<String, Long> linesHash) throws SQLException {
         HashMap<String, String> params = new HashMap<String, String>();
 
-        Long linhaId = null;
+        Long lineId = null;
 
-        if (!linha.isEmpty()) {
-            linha = linha.split("\\.")[0];
-            linhaId = linhasHash.get(linha);
-            if (linhaId == null) {
-                params.clear();
-                params.put(Constants.KEY_LINHA, "'" + linha + "'");
-                linhaId = dao.insert(params);
-                linhasHash.put(linha, linhaId);
+        if (!line.isEmpty()) {
+            line = line.split("\\.")[0];
+            lineId = linesHash.get(line);
+            if (lineId == null) {
+                params.put("line_number", "'" + line + "'");
+                lineId = lineDao.insert(params);
+                linesHash.put(line, lineId);
             }
         }
-        return linhaId;
+        return lineId;
     }
+
 }

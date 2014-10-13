@@ -6,7 +6,7 @@
 package br.uff.bus_data.dao;
 
 import br.uff.bus_data.helper.Constants;
-import br.uff.bus_data.models.Coleta;
+import br.uff.bus_data.models.LoadedFile;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -19,49 +19,51 @@ import java.util.List;
  *
  * @author schettino
  */
-public class ColetaDAO extends AbstractDAO<Coleta> {
+public class LoadedFileDAO extends AbstractDAO<LoadedFile> {
     
-    @Override
-    public Coleta getFromResultSet(ResultSet rs) throws SQLException {
-        SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
-        Coleta c = new Coleta();
-        Date data_hora_inicio = null;
-        Date data_hora_fim = null;
+    @Override public LoadedFile getFromResultSet(ResultSet rs) throws SQLException {
+        SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);   
+        LoadedFile uf = new LoadedFile();
+        Date startTime = null;
+        Date endTime = null;
         try {
-            data_hora_inicio = dt.parse(rs.getString("data_hora_inicio"));
+            startTime = dt.parse(rs.getString("start_time"));
         } catch (ParseException ex) {
         }
         try {
-            data_hora_fim = dt.parse(rs.getString("data_hora_fim"));
+            endTime = dt.parse(rs.getString("end_time"));
         } catch (ParseException ex) {
         }
         int i = rs.getInt("id");
         int status = rs.getInt("status");
-        String erros = rs.getString("erros");
+        int type = rs.getInt("type");
+        String errors = rs.getString("errors");
         String filename = rs.getString("filename");
         
-        c.setDataHoraInicio(data_hora_inicio);
-        c.setDataHoraFim(data_hora_fim);
-        c.setId(i);
-        c.setStatus(status);
-        c.setErros(erros);
-        c.setFilename(filename);
+        uf.setStartTime(startTime);
+        uf.setEndTime(endTime);
+        uf.setId(i);
+        uf.setType(type);
+        uf.setStatus(status);
+        uf.setErrors(errors);
+        uf.setFilename(filename);
         
-        return c;
+        return uf;
     }
     
     @Override
     public String getTableName() {
-        return "coletas";
+        return "loaded_files";
     }
     
     @Override
     public List<String> getAttributes() {
         ArrayList<String> attrs = new ArrayList<String>();
-        attrs.add("data_hora_inicio");
-        attrs.add("data_hora_fim");
+        attrs.add("start_time");
+        attrs.add("end_time");
         attrs.add("status");
-        attrs.add("erros");
+        attrs.add("type");
+        attrs.add("errors");
         attrs.add("filename");
         return attrs;
     }

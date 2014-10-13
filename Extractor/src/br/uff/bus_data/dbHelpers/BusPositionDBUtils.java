@@ -5,43 +5,30 @@
  */
 package br.uff.bus_data.dbHelpers;
 
-import br.uff.bus_data.Main;
 import br.uff.bus_data.helper.Constants;
+import br.uff.bus_data.models.BusPosition;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author schettino
  */
-public class DadoRJDBUtils {
+public class BusPositionDBUtils {
 
-    public static HashMap<String, String> geraParams(List<Object> dado, Long linhaId, Long ordemId, Long coletaId) throws SQLException {
+    public static HashMap<String, String> generateParams(BusPosition busPosition) throws SQLException {
         HashMap<String, String> params = new HashMap<String, String>();
 
-        SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
-        SimpleDateFormat dt2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String data = String.valueOf(dado.get(Constants.INDEX_DATA_HORA));
-        if (!data.isEmpty()) {
-            try {
-                Date date = dt.parse(data);
-                data = dt2.format(date);
-            } catch (java.text.ParseException ex) {
-                Logger.getLogger(DadoRJDBUtils.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        params.put("linha_id", String.valueOf(linhaId));
-        params.put("ordem_id", String.valueOf(ordemId));
-        params.put("coleta_id", String.valueOf(coletaId));
-        params.put("data_hora", "'" + data + "'");
-        params.put("latitude", String.valueOf(dado.get(Constants.INDEX_LATITUDE)));
-        params.put("longitude", String.valueOf(dado.get(Constants.INDEX_LONGITUDE)));
-        params.put("velocidade", String.valueOf(dado.get(Constants.INDEX_VELOCIDADE)));
+        SimpleDateFormat dt = new SimpleDateFormat(Constants.JSON_DATE_FORMAT);
+        SimpleDateFormat dt2 = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
+        String date = String.valueOf(busPosition.getTime());
+        params.put("line_id", String.valueOf(busPosition.getLineId()));
+        params.put("bus_id", String.valueOf(busPosition.getBusId()));
+        params.put("loaded_file_id", String.valueOf(busPosition.getLoadedFileId()));
+        params.put("time", "'" + date + "'");
+        params.put("position", String.valueOf("'" + busPosition.getPosition()+ "'"));
+        params.put("speed", String.valueOf(busPosition.getSpeed()));
         return params;
     }
 }

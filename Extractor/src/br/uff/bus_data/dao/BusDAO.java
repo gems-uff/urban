@@ -5,7 +5,7 @@
  */
 package br.uff.bus_data.dao;
 
-import br.uff.bus_data.models.Ordem;
+import br.uff.bus_data.models.Bus;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,25 +15,25 @@ import java.util.List;
  *
  * @author schettino
  */
-public class OrdemDAO extends AbstractDAO<Ordem> {
+public class BusDAO extends AbstractDAO<Bus> {
 
     @Override
-    public Ordem getFromResultSet(ResultSet rs) throws SQLException {
-        String num = rs.getString("ordem");
+    public Bus getFromResultSet(ResultSet rs) throws SQLException {
+        String num = rs.getString("bus_number");
         int i = rs.getInt("id");
-        return new Ordem(num, i);
+        return new Bus(num, i);
     }
     
     
     @Override
     public  String getTableName() {
-        return "ordens";
+        return "buses";
     }
     
     @Override
     public  List<String> getAttributes(){
         ArrayList<String> attrs = new ArrayList<String>();
-        attrs.add("ordem");
+        attrs.add("bus_number");
         return attrs;
     }
 }

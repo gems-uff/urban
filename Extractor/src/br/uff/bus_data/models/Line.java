@@ -12,22 +12,22 @@ import java.util.Map;
  *
  * @author schettino
  */
-public class Linha implements Comparable<Linha>, Mappable<String,String>{
+public class Line implements Comparable<Line>, Mappable<String,String>{
 
-    String numero;
+    String lineNumber;
     long id;
 
-    public Linha(String numero, int id) {
-        this.numero = numero;
+    public Line(String number, int id) {
+        this.lineNumber = number;
         this.id = id;
     }
 
-    public String getNumero() {
-        return numero;
+    public String getLineNumber() {
+        return lineNumber;
     }
 
-    public void setNumero(String numero) {
-        this.numero = numero;
+    public void setLineNumber(String lineNumber) {
+        this.lineNumber = lineNumber;
     }
 
     public long getId() {
@@ -41,8 +41,8 @@ public class Linha implements Comparable<Linha>, Mappable<String,String>{
     
 
     @Override
-    public int compareTo(Linha o) {
-        if (this.numero.equals(o.numero)) {
+    public int compareTo(Line o) {
+        if (this.lineNumber.equals(o.lineNumber)) {
             return 0;
         }
         return -1;
@@ -52,7 +52,7 @@ public class Linha implements Comparable<Linha>, Mappable<String,String>{
     public Map<String, String> getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("id", String.valueOf(this.id));
-        map.put("linha", "'"+ this.numero + "'");
+        map.put("line_number", "'"+ this.lineNumber + "'");
         return map;
     }
 

@@ -5,23 +5,25 @@
  */
 package br.uff.bus_data;
 
-import br.uff.bus_data.dao.ColetaDAO;
-import br.uff.bus_data.dao.DadoRJDAO;
-import br.uff.bus_data.dao.DescarteDAO;
-import br.uff.bus_data.dao.LinhaDAO;
-import br.uff.bus_data.dao.OrdemDAO;
-import br.uff.bus_data.dbHelpers.ColetaDBUtils;
-import br.uff.bus_data.dbHelpers.DadoRJDBUtils;
+import br.uff.bus_data.dao.LoadedFileDAO;
+import br.uff.bus_data.dao.BusPositionDAO;
+import br.uff.bus_data.dao.DisposalDAO;
+import br.uff.bus_data.dao.LineDAO;
+import br.uff.bus_data.dao.BusDAO;
+import br.uff.bus_data.dbConnection.DBConnectionInterface;
+import br.uff.bus_data.dbConnection.PostgresDBConnection;
+import br.uff.bus_data.dbHelpers.LoadedFileDBUtils;
+import br.uff.bus_data.dbHelpers.BusPositionDBUtils;
 import br.uff.bus_data.dbHelpers.IndexesDBUtils;
-import br.uff.bus_data.dbHelpers.LinhaDBUtils;
-import br.uff.bus_data.dbHelpers.OrdemDBUtils;
+import br.uff.bus_data.dbHelpers.LineDBUtils;
+import br.uff.bus_data.dbHelpers.BusDBUtils;
 import br.uff.bus_data.helper.Constants;
-import br.uff.bus_data.helper.DBConnection;
 import br.uff.bus_data.helper.DeleteDirectory;
 import br.uff.bus_data.helper.FileFinder;
 import br.uff.bus_data.helper.HashUtils;
 import br.uff.bus_data.helper.UnZip;
-import br.uff.bus_data.models.DadoRJ;
+import br.uff.bus_data.models.BusPosition;
+import br.uff.bus_data.models.LoadedFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -30,6 +32,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,41 +44,40 @@ import org.json.simple.parser.ParseException;
  *
  * @author schettino
  */
-public class Main {
+public class ImportBusPositions {
 
-    private static Long coletaId;
-    private static Long linhaId;
-    private static Long ordemId;
+    private static Long loadedFileId;
+    private static Long lineId;
+    private static Long busId;
 
     public static void main(String[] args) throws FileNotFoundException {
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            String connectionUrl = "jdbc:" + DBConnection.JDBC + ":" + DBConnection.DATABASE + "?"
-                    + "user=" + DBConnection.USER + "&password=" + DBConnection.PASSWORD;
-            Connection con = DriverManager.getConnection(connectionUrl);
-
+            DBConnectionInterface dbCon = new PostgresDBConnection();
+            Connection con = dbCon.dbConection();
             Statement stmt = null;
             con.setAutoCommit(false);
             stmt = con.createStatement();
             JSONParser parser = new JSONParser();
 
-            Map<String, Long> linhasHash = HashUtils.loadLinhas(stmt); // entrada: numero da linha; saída: id da linha
-            Map<String, Long> ordensHash = HashUtils.loadOrdens(stmt);// entrada: ordem do ônibus; saída: id da ordem
-            Map<String, DadoRJ> dadosHash = HashUtils.loadPosicoes(stmt);// entrada: ordem do ônibus; saída: ultima posicao do onibus
+            Map<String, Long> linesHash = HashUtils.loadLinhas(stmt); 
+            Map<String, Long> busesHash = HashUtils.loadOrdens(stmt);
+            Map<String, BusPosition> busPositionsHash = HashUtils.loadPosicoes(stmt);
+            List<Map<String, String>> insertParamsPositions = new ArrayList<Map<String, String>>();
+            List<Map<String, String>> insertParamsDispolsals = new ArrayList<Map<String, String>>();
 
-            ColetaDAO coletaDao = new ColetaDAO();
-            coletaDao.setStatement(stmt);
-            LinhaDAO linhaDao = new LinhaDAO();
-            linhaDao.setStatement(stmt);
-            OrdemDAO ordemDao = new OrdemDAO();
-            ordemDao.setStatement(stmt);
-            DadoRJDAO dadoRJDao = new DadoRJDAO();
-            dadoRJDao.setStatement(stmt);
-            DescarteDAO descarteDao = new DescarteDAO();
-            descarteDao.setStatement(stmt);
+            LoadedFileDAO loadedFileDao = new LoadedFileDAO();
+            loadedFileDao.setStatement(stmt);
+            LineDAO lineDao = new LineDAO();
+            lineDao.setStatement(stmt);
+            BusDAO busDao = new BusDAO();
+            busDao.setStatement(stmt);
+            BusPositionDAO busPositionDao = new BusPositionDAO();
+            busPositionDao.setStatement(stmt);
+            DisposalDAO disposalDao = new DisposalDAO();
+            disposalDao.setStatement(stmt);
 
-            IndexesDBUtils.dropIndexes(stmt);
+            IndexesDBUtils.dropIndexes(stmt, con);
 
             File currentDirFile = new File("");
             String projRoot = currentDirFile.getAbsolutePath();
@@ -94,63 +96,74 @@ public class Main {
                 for (File file : files) {
                     if (file.isFile()) {
                         try {
-                            con.close();
-                            con = DriverManager.getConnection(connectionUrl);
-                            con.setAutoCommit(false);
-                            stmt = con.createStatement();
-                            coletaDao.setStatement(stmt);
-                            linhaDao.setStatement(stmt);
-                            ordemDao.setStatement(stmt);
-                            dadoRJDao.setStatement(stmt);
-                            descarteDao.setStatement(stmt);
-
-                            coletaId = coletaDao.insert(ColetaDBUtils.insertDefaultParams(file.getName()));
+                            loadedFileId = loadedFileDao.insert(LoadedFileDBUtils.insertDefaultParams(file.getName(), LoadedFile.TYPE_BUS_POSITIONS));
                             JSONObject rootObject = (JSONObject) parser.parse(new FileReader(file.getAbsoluteFile()));
-                            ArrayList<String> colunas = (ArrayList<String>) rootObject.get(Constants.KEY_COLUNAS);
-                            for (int i = 0; i < colunas.size(); i++) {
-                                if (!colunas.get(i).equals(Constants.COLUNAS[i])) {
-                                    ColetaDBUtils.finalizaColetaComErros(coletaDao, coletaId, Constants.MSG_ERRO_COLUNAS);
+                            ArrayList<String> columns = (ArrayList<String>) rootObject.get(Constants.KEY_COLUMNS);
+                            for (int i = 0; i < columns.size(); i++) {
+                                if (!columns.get(i).equals(Constants.COLUMNS[i])) {
+                                    LoadedFileDBUtils.finishWithErrors(loadedFileDao, loadedFileId, Constants.MSG_ERROR_COLUMNS);
                                     return;
                                 }
                             }
-                            ArrayList<Object> dados = (ArrayList<Object>) rootObject.get(Constants.KEY_DADOS);
-                            for (int i = 0; i < dados.size(); i++) {
-                                ArrayList<Object> dado = (ArrayList<Object>) dados.get(i);
-                                linhaId = LinhaDBUtils.insereLinha(linhaDao,
-                                        String.valueOf(dado.get(Constants.INDEX_LINHA)),
-                                        linhasHash);
+                            ArrayList<Object> dataSet = (ArrayList<Object>) rootObject.get(Constants.KEY_DATA);
+                            for (int i = 0; i < dataSet.size(); i++) {
+                                ArrayList<Object> data = (ArrayList<Object>) dataSet.get(i);
+                                lineId = LineDBUtils.findOrInsertLine(lineDao,
+                                        String.valueOf(data.get(Constants.INDEX_LINE)),
+                                        linesHash);
 
-                                String ordem = String.valueOf(dado.get(Constants.INDEX_ORDEM));
-                                ordemId = OrdemDBUtils.insereOrdem(ordemDao, ordem,
-                                        ordensHash);
+                                String busNumber = String.valueOf(data.get(Constants.INDEX_BUS_NUMBER));
+                                busId = BusDBUtils.insertBus(busDao, busNumber,
+                                        busesHash);
 
-                                DadoRJ dadoAtual = dadosHash.get(ordem);
-                                DadoRJ novoDado = DadoRJ.fromJsonFile(dado, linhaId, ordemId, coletaId);
-                                HashMap<String, String> params = DadoRJDBUtils.geraParams(dado, linhaId, ordemId, coletaId);
+                                BusPosition currentPosition = busPositionsHash.get(busNumber);
+                                BusPosition newPosition = BusPosition.fromJsonFile(data, lineId, busId, loadedFileId);
+                                HashMap<String, String> params = BusPositionDBUtils.generateParams(newPosition);
 
-                                if ((dadoAtual == null)) {
-                                    String motivoDescarte = dadoAtual.motivoDescarte(novoDado);
-                                    if (motivoDescarte == null) {
-                                        dadoRJDao.insert(params);
-                                        dadosHash.put(ordem, novoDado);
+                                if ((currentPosition != null)) {
+                                    String disposalReason = currentPosition.motivoDescarte(newPosition);
+                                    if (disposalReason == null) {
+                                        insertParamsPositions.add(params);
+//                                        Long dadoId = dadoRJDao.insert(params);
+//                                        novoDado.setId(dadoId);
+                                        busPositionsHash.put(busNumber, newPosition);
                                     } else {
-                                        params.put("motivo", "'" + motivoDescarte + "'");
-                                        descarteDao.insert(params);
+                                        params.put("disposal_reason", "'" + disposalReason + "'");
+//                                        params.put("last_postion_id", String.valueOf(dadoAtual.getId()));
+                                        insertParamsDispolsals.add(params);
+//                                        descarteDao.insert(params);
                                     }
+                                } else {
+                                    insertParamsPositions.add(params);
+//                                    Long dadoId = dadoRJDao.insert(params);
+//                                    novoDado.setId(dadoId);
+                                    busPositionsHash.put(busNumber, newPosition);
                                 }
                             }
+                            busPositionDao.insert(insertParamsPositions);
+                            disposalDao.insert(insertParamsDispolsals);
+                            insertParamsPositions.clear();
+                            insertParamsDispolsals.clear();
 
-                            ColetaDBUtils.finalizaColetaComSucesso(coletaDao, coletaId);
+                            LoadedFileDBUtils.finishSuccessfully(loadedFileDao, loadedFileId);
                             con.commit();
                             System.out.println("file " + file.getName());
                         } catch (IOException ex) {
-                            ColetaDBUtils.finalizaColetaComErros(coletaDao, coletaId, ex.getMessage());
+                            busPositionDao.insert(insertParamsPositions);
+                            disposalDao.insert(insertParamsDispolsals);
+                            insertParamsPositions.clear();
+                            insertParamsDispolsals.clear();
+                            LoadedFileDBUtils.finishWithErrors(loadedFileDao, loadedFileId, ex.getMessage());
                             con.commit();
-                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (ParseException ex) {
-                            ColetaDBUtils.finalizaColetaComErros(coletaDao, coletaId, ex.getMessage());
+                            busPositionDao.insert(insertParamsPositions);
+                            disposalDao.insert(insertParamsDispolsals);
+                            insertParamsPositions.clear();
+                            insertParamsDispolsals.clear();
+                            LoadedFileDBUtils.finishWithErrors(loadedFileDao, loadedFileId, ex.getMessage());
                             con.commit();
-                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
                     }
@@ -162,14 +175,12 @@ public class Main {
                     Logger.getLogger(UnZip.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            IndexesDBUtils.createIndexes(stmt);
+            IndexesDBUtils.createIndexes(stmt, con);
 
             stmt.close();
             con.close();
         } catch (SQLException e) {
             System.out.println("SQL Exception: " + e.toString());
-        } catch (ClassNotFoundException cE) {
-            System.out.println("Class Not Found Exception: " + cE.toString());
         }
     }
 }

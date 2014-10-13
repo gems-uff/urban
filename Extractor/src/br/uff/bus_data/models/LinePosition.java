@@ -5,133 +5,122 @@
  */
 package br.uff.bus_data.models;
 
-import br.uff.bus_data.Main;
-import br.uff.bus_data.helper.Constants;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.postgis.PGgeometry;
+import org.postgis.Point;
 
 /**
  *
  * @author schettino
  */
-public class Descarte implements Mappable<String, String> {
+public class LinePosition implements Mappable<String, String> {
 
     Long id;
-    Long coletaId;
-    Long linhaId;
-    Long ordemId;
-    Date dataHora;
-    float latitude;
-    float longitude;
-    float velocidade;
-    String motivo;
+    int sequenceNumber;
+    Long lineId;
+    Long loadedFileId;
+    Double latitude;
+    Double longitude;
+    PGgeometry position;
+    String description;
+    String company;
+    Long shapeId;
 
-    public long getId() {
+    public Long getLoadedFileId() {
+        return loadedFileId;
+    }
+
+    public void setLoadedFileId(Long loadedFileId) {
+        this.loadedFileId = loadedFileId;
+    }
+    
+    public Long getShapeId() {
+        return shapeId;
+    }
+
+    public void setShapeId(Long shapeId) {
+        this.shapeId = shapeId;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getColetaId() {
-        return coletaId;
+    public int getSequenceNumber() {
+        return sequenceNumber;
     }
 
-    public void setColetaId(long coletaId) {
-        this.coletaId = coletaId;
+    public void setSequenceNumber(int sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
     }
 
-    public long getLinhaId() {
-        return linhaId;
+    public Long getLineId() {
+        return lineId;
     }
 
-    public void setLinhaId(long linhaId) {
-        this.linhaId = linhaId;
+    public void setLineId(Long lineId) {
+        this.lineId = lineId;
     }
 
-    public long getOrdemId() {
-        return ordemId;
-    }
-
-    public void setOrdemId(long ordemId) {
-        this.ordemId = ordemId;
-    }
-
-    public Date getDataHora() {
-        return dataHora;
-    }
-
-    public void setDataHora(Date dataHora) {
-        this.dataHora = dataHora;
-    }
-
-    public float getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
-    public float getVelocidade() {
-        return velocidade;
+    public PGgeometry getPosition() {
+        return position;
     }
 
-    public void setVelocidade(float velocidade) {
-        this.velocidade = velocidade;
+    public void setPosition(PGgeometry position) {
+        this.position = position;
     }
 
-    public Position getPosition() {
-        Position p = new Position(this.latitude, this.longitude);
-        return p;
+    public String getDescription() {
+        return description;
     }
 
-    public String getMotivo() {
-        return motivo;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setMotivo(String motivo) {
-        this.motivo = motivo;
+    public String getCompany() {
+        return company;
     }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
 
     @Override
     public Map<String, String> getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
-        SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
         map.put("id", String.valueOf(this.id));
-        map.put("coleta_id", String.valueOf(this.coletaId));
-        map.put("linha_id", String.valueOf(this.linhaId));
-        map.put("ordem_id", String.valueOf(this.ordemId));
-        map.put("latitude", String.valueOf(this.latitude));
-        map.put("longitude", String.valueOf(this.longitude));
-        map.put("velocidade", String.valueOf(this.velocidade));
-        map.put("data_hora", "'" + dt.format(this.dataHora) + "'");
-        map.put("motivo", "'" + dt.format(this.motivo) + "'");
+        map.put("sequence_number", String.valueOf(this.sequenceNumber));
+        map.put("line_id", String.valueOf(this.lineId));
+        map.put("shape_id", String.valueOf(this.shapeId));
+        map.put("loaded_file_id", String.valueOf(this.loadedFileId));
+        Point p = new Point(this.longitude, this.latitude);
+        p.setSrid(4326);
+        map.put("position", "'" + String.valueOf(p.toString()) + "'");
+        map.put("description", "'" + this.description + "'");
+        map.put("company", "'" + this.company + "'");
         return map;
     }
-    
-    @Override
-    public String toString(){
-        return "Latitude: " + this.latitude + "; Longitude: " + this.longitude
-                + "; velocidade: " + this.velocidade + "; dataHora: "
-                + this.dataHora + "; Ordem: " + this.ordemId + "; Linha: "
-                + this.linhaId + "; Coleta: " + this.coletaId + "; Motivo: "
-                + this.motivo;
-    }
 }
-
-

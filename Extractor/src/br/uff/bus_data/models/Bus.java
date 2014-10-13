@@ -12,23 +12,24 @@ import java.util.Map;
  *
  * @author schettino
  */
-public class Ordem implements Comparable<Ordem>, Mappable<String, String> {
+public class Bus implements Comparable<Bus>, Mappable<String, String> {
 
-    String numero;
+    String busNumber;
     long id;
 
-    public Ordem(String numero, int id) {
-        this.numero = numero;
+    public Bus(String number, int id) {
+        this.busNumber = number;
         this.id = id;
     }
 
-    public String getNumero() {
-        return numero;
+    public String getBusNumber() {
+        return busNumber;
     }
 
-    public void setNumero(String numero) {
-        this.numero = numero;
+    public void setBusNumber(String busNumber) {
+        this.busNumber = busNumber;
     }
+
 
     public long getId() {
         return id;
@@ -39,8 +40,8 @@ public class Ordem implements Comparable<Ordem>, Mappable<String, String> {
     }
     
     @Override
-    public int compareTo(Ordem o) {
-        if (this.numero.equals(o.numero)) {
+    public int compareTo(Bus o) {
+        if (this.busNumber.equals(o.busNumber)) {
             return 0;
         }
         return -1;
@@ -50,7 +51,7 @@ public class Ordem implements Comparable<Ordem>, Mappable<String, String> {
     public Map<String, String> getMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("id", String.valueOf(this.id));
-        map.put("ordem", "'" + this.numero+ "'");
+        map.put("bus_number", "'" + this.busNumber+ "'");
         return map;
     }
 }

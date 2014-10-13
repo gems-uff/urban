@@ -5,12 +5,12 @@
  */
 package br.uff.bus_data.helper;
 
-import br.uff.bus_data.dao.DadoRJDAO;
-import br.uff.bus_data.dao.LinhaDAO;
-import br.uff.bus_data.dao.OrdemDAO;
-import br.uff.bus_data.models.DadoRJ;
-import br.uff.bus_data.models.Linha;
-import br.uff.bus_data.models.Ordem;
+import br.uff.bus_data.dao.BusPositionDAO;
+import br.uff.bus_data.dao.LineDAO;
+import br.uff.bus_data.dao.BusDAO;
+import br.uff.bus_data.models.BusPosition;
+import br.uff.bus_data.models.Line;
+import br.uff.bus_data.models.Bus;
 import br.uff.bus_data.models.Position;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,32 +26,30 @@ public class HashUtils {
 
     public static Map<String, Long> loadLinhas(Statement stmt) throws SQLException {
         Map<String, Long> linhasHash = new HashMap<String, Long>();
-        LinhaDAO linhaDao = new LinhaDAO();
+        LineDAO linhaDao = new LineDAO();
         linhaDao.setStatement(stmt);
-        List<Linha> listLinhas = linhaDao.all();
-        for (Linha linha : listLinhas) {
-            linhasHash.put(linha.getNumero(), linha.getId());
+        List<Line> listLinhas = linhaDao.all();
+        for (Line linha : listLinhas) {
+            linhasHash.put(linha.getLineNumber(), linha.getId());
         }
         return linhasHash;
     }
 
     public static Map<String, Long> loadOrdens(Statement stmt) throws SQLException {
         Map<String, Long> ordensHash = new HashMap<String, Long>();
-        OrdemDAO ordemDao = new OrdemDAO();
-        ordemDao.setStatement(stmt);
-        List<Ordem> listOrdens = ordemDao.all();
-        for (Ordem ordem : listOrdens) {
-            ordensHash.put(ordem.getNumero(), ordem.getId());
+        BusDAO onibusDao = new BusDAO();
+        onibusDao.setStatement(stmt);
+        List<Bus> listOnibus = onibusDao.all();
+        for (Bus onibus : listOnibus) {
+            ordensHash.put(onibus.getBusNumber(), onibus.getId());
         }
         return ordensHash;
     }
-    
-    public static Map<String, DadoRJ> loadPosicoes(Statement stmt) throws SQLException {
-        DadoRJDAO dadoRJDao = new DadoRJDAO();
-        dadoRJDao.setStatement(stmt);
-        return dadoRJDao.selectUltimasPosicoes();
+
+    public static Map<String, BusPosition> loadPosicoes(Statement stmt) throws SQLException {
+        BusPositionDAO busPositionDao = new BusPositionDAO();
+        busPositionDao.setStatement(stmt);
+        return busPositionDao.selectUltimasPosicoes();
     }
 
 }
-
-

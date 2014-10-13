@@ -5,7 +5,7 @@
  */
 package br.uff.bus_data.dbHelpers;
 
-import br.uff.bus_data.dao.ColetaDAO;
+import br.uff.bus_data.dao.LoadedFileDAO;
 import br.uff.bus_data.helper.Constants;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -17,40 +17,40 @@ import java.util.Map;
  *
  * @author schettino
  */
-public class ColetaDBUtils {
+public class LoadedFileDBUtils {
 
-    public static Map<String, String> insertDefaultParams(String filename) {
+    public static Map<String, String> insertDefaultParams(String filename, int type) {
+
         Map<String, String> params = new HashMap<String, String>();
-        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
         Date d = new Date();
 
-        params.put("data_hora_inicio", "'" + dt.format(d) + "'");
-        params.put("data_hora_fim", "NULL");
-        params.put("erros", "NULL");
+        params.put("start_time", "'" + dt.format(d) + "'");
+        params.put("end_time", "NULL");
+        params.put("errors", "NULL");
         params.put("filename", "'" + filename + "'");
-        params.put("status", String.valueOf(Constants.STATUS_INICIADA));
+        params.put("status", String.valueOf(Constants.STATUS_STARTED));
+        params.put("type", String.valueOf(type));
         return params;
     }
 
-    public static void finalizaColetaComSucesso(ColetaDAO dao, Long coletaId) throws SQLException {
+    public static void finishSuccessfully(LoadedFileDAO ufDao, Long uploadedFileId) throws SQLException {
         Map<String, String> params = new HashMap<String, String>();
-        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
         Date d = new Date();
-        params.put("data_hora_fim", "'" + dt.format(d) + "'");
-        params.put("status", String.valueOf(Constants.STATUS_ENCERRADA_COM_SUCESSO));
-        dao.update(params, coletaId);
+        params.put("end_time", "'" + dt.format(d) + "'");
+        params.put("status", String.valueOf(Constants.STATUS_FINISHED_SUCCESSFULLY));
+        ufDao.update(params, uploadedFileId);
     }
 
-    public static void finalizaColetaComErros(ColetaDAO dao, Long coletaId, String erros) throws SQLException {
+    public static void finishWithErrors(LoadedFileDAO ufDao, Long uploadedFileId, String errors) throws SQLException {
         Map<String, String> params = new HashMap<String, String>();
-        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
         Date d = new Date();
-        params.put("data_hora_fim", "'" + dt.format(d) + "'");
-        params.put("status", String.valueOf(Constants.STATUS_ENCERRADA_COM_ERROS));
-        params.put("erros", erros);
-        dao.update(params, coletaId);
+        params.put("end_time", "'" + dt.format(d) + "'");
+        params.put("status", String.valueOf(Constants.STATUS_FINISHED_WITH_ERRORS));
+        params.put("errors", errors);
+        ufDao.update(params, uploadedFileId);
     }
 
 }
-
-
