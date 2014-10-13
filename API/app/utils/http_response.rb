@@ -6,14 +6,14 @@ class HttpResponse
   CODE_LINE_NOT_FOUND = 3
   CODE_BUS_NOT_FOUND = 4
 
-  def self.code_msg(code, message = nil)
+  def self.code_msg(code)
     case(code)
       when CODE_SUCCESS
         I18n.t('messages.errors.http_response.success')
       when CODE_ERROR_MISSING_PARAMETER
-        I18n.t('messages.errors.http_response.error_mis_param', {:params => message})
+        I18n.t('messages.errors.http_response.error_mis_param')
       when CODE_UNKNOWN_ERROR
-        I18n.t('messages.errors.http_response.unknow_error', {:error => message})
+        I18n.t('messages.errors.http_response.unknow_error')
       when CODE_LINE_NOT_FOUND
         I18n.t('messages.errors.http_response.line_not_found')
       when CODE_BUS_NOT_FOUND

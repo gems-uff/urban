@@ -3,8 +3,8 @@ pt-BR:
     errors:
       http_response:
         success: "Sucesso"
-        unknow_error: "Erro inesperado: %{error}"
-        error_mis_param: "Parâmetros não informados: %{params}"
+        unknow_error: "Erro inesperado: "
+        error_mis_param: "Parâmetros não informados: "
         line_not_found: "Linha não encontrada"
         bus_not_found: "Ônibus não encontrado"
   date:
