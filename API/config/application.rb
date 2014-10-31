@@ -9,8 +9,13 @@ Bundler.require(*Rails.groups)
 module BusData
   class Application < Rails::Application
     config.active_record.schema_format = :sql
-    config.i18n.locale = "pt-BR"
-    config.i18n.default_locale = "pt-BR"
+
+    Dir.glob("#{Rails.root}/app/assets/images/**/").each do |path|
+      config.assets.paths << path
+    end
+
+    #config.i18n.locale = "pt-BR"
+    #config.i18n.default_locale = "pt-BR"
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.

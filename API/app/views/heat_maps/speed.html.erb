@@ -5,30 +5,7 @@
 </div>
 
 
-<div class="col-md-12 row" style="margin-bottom: 30px">
-
-  <form role="form" id="form">
-    <div class="col-md-5">
-      <div class="form-group">
-        <label for="line" class="col-sm-2 control-label">Line Number</label>
-
-        <div class="col-sm-6">
-          <input type="text" class="form-control" id="line" placeholder="Enter line number">
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="form-group">
-        <label for="show_stops" class="col-sm-4 control-label">Show stops</label>
-
-        <div class="col-sm-6">
-          <input id="show_stops" type="checkbox" name="show_stops" data-on-text="YES" data-off-text="NO" checked data-size="small" data-on-color="success" data-off-color="danger">
-        </div>
-      </div>
-    </div>
-  </form>
-
-</div>
+<%=render :partial => 'filter'%>
 
 <div class="row">
   <div id="map-canvas" style="height: 500px; width: 100%"></div>
@@ -38,7 +15,6 @@
 
 
 <script>
-
     var map, mc, heatmap;
     var mcOptions = {
         gridSize: 50,
@@ -126,7 +102,7 @@
         if (line == null)
             line = $("#line").val();
 
-        $.get('<%=with_line_stops_and_positions_api_v1_bus_positions_path%>', { line: line, format: 'json' })
+        $.get('<%=with_line_stops_positions_and_speed_avg_api_v1_bus_positions_path%>', { line: line, format: 'json' })
                 .done(function (data) {
                     positions = data.positions
                     stops = data.stops
@@ -136,13 +112,13 @@
                     deleteMarkers();
                     deletePolylines();
                     for (var i = 0; i < positions.length; i++) {
-                        addPolyline(positions[i]['latitude'], positions[i]['longitude']);
+                        addPolyline(positions[i][1], positions[i][0]);
                     }
                     for (var i = 0; i < stops.length; i++) {
-                        addMarker(new google.maps.LatLng(stops[i]['latitude'], stops[i]['longitude']));
+                        addMarker(new google.maps.LatLng(stops[i][1], stops[i][0]));
                     }
                     for (var i = 0; i < bus_positions.length; i++) {
-                        heatmapPoints.push({location: new google.maps.LatLng(bus_positions[i]['latitude'], bus_positions[i]['longitude']), weight: bus_positions[i]['speed']});
+                        heatmapPoints.push({location: new google.maps.LatLng(bus_positions[i][1], bus_positions[i][0]), weight: bus_positions[i][2]});
                     }
                     showPolylines();
 

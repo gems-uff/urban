@@ -5,30 +5,7 @@
 </div>
 
 
-<div class="col-md-12 row" style="margin-bottom: 30px">
-
-  <form role="form" id="form">
-    <div class="col-md-5">
-      <div class="form-group">
-        <label for="line" class="col-sm-2 control-label">Line Number</label>
-
-        <div class="col-sm-6">
-          <input type="text" class="form-control" id="line" placeholder="Enter line number">
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="form-group">
-        <label for="show_stops" class="col-sm-4 control-label">Show stops</label>
-
-        <div class="col-sm-6">
-          <input id="show_stops" type="checkbox" name="show_stops" data-on-text="YES" data-off-text="NO" checked data-size="small" data-on-color="success" data-off-color="danger">
-        </div>
-      </div>
-    </div>
-  </form>
-
-</div>
+<%=render :partial => 'filter'%>
 
 <div class="row">
   <div id="map-canvas" style="height: 500px; width: 100%"></div>
@@ -36,9 +13,7 @@
 
 <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
 
-
 <script>
-
     var map, mc, heatmap;
     var mcOptions = {
         gridSize: 50,
@@ -142,13 +117,13 @@
                         addMarker(new google.maps.LatLng(stops[i]['latitude'], stops[i]['longitude']));
                     }
                     for (var i = 0; i < bus_positions.length; i++) {
-                        heatmapPoints.push(new google.maps.LatLng(bus_positions[i]['latitude'], bus_positions[i]['longitude']));
+                        heatmapPoints.push(new google.maps.LatLng(bus_positions[i][1], bus_positions[i][0]));
                     }
                     showPolylines();
 
                     if ($('input[name="show_stops"]').bootstrapSwitch('state')) {
                         showMarkers();
-                    }else{
+                    } else {
                         clearMarkers();
                     }
                     var pointArray = new google.maps.MVCArray(heatmapPoints);
@@ -156,7 +131,7 @@
 
                     heatmap = new google.maps.visualization.HeatmapLayer({
                         data: pointArray,
-                        gradient:[
+                        gradient: [
                             'rgba(255, 0, 0, 0)',
                             'rgba(255, 17, 0, 1)',
                             'rgba(255, 35, 0, 1)',
@@ -189,7 +164,7 @@
                             'rgba(0, 255, 0, 1)'
                         ],
                         maxIntensity: 50
-                   });
+                    });
                     heatmap.setMap(map);
                     line = null;
                 });
@@ -199,7 +174,6 @@
     var markers = []
 
     var heatmapPoints = [];
-
 
 
     // Add a marker to the map and push to the array.
@@ -248,14 +222,13 @@
     }
 
     $('input[name="show_stops"]').bootstrapSwitch();
-    $('input[name="show_stops"]').on('switchChange.bootstrapSwitch', function(event, state) {
+    $('input[name="show_stops"]').on('switchChange.bootstrapSwitch', function (event, state) {
         if (state) {
             showMarkers();
         } else {
             clearMarkers();
         }
     });
-
 
 
     function toggleHeatmap() {

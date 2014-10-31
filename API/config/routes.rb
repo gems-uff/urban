@@ -9,6 +9,7 @@ Rails.application.routes.draw do
           get :bus_history
           get :on_radius
           get :with_line_stops_and_positions
+          get :with_line_stops_positions_and_speed_avg
         end
       end
       resources :line_positions, :only => [] do

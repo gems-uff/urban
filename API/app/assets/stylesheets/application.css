@@ -12,5 +12,19 @@
  *
  *= require_tree .
  *= require_self
- *= require jquery-ui
+ *= require jquery-ui.min
  */
+
+.slider-selection {
+    background: #BBBBBB;
+}
+
+.slider-horizontal {
+    width: 100% !important;
+}
+
+.vcenter{
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
