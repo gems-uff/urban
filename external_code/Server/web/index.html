@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>Untitled [by choice]</title>
+        <script src="main.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <body onload="main();">
+        <div id="container">
+            <div id="ui">
+                <div style="display: inline-block">
+                    <div class="inputs">
+                        <label for="route_select">Route: </label>
+                        <select name="Linhas disponiveis" id="route_select"></select>
+                    </div>
+                    <div class="inputs">
+                        <label for="grid_size">Grid size: </label>
+                        <input type="number" id="grid_size" value="10"/>
+                    </div>
+                    <div class="inputs">
+                        <button id="request" onclick="send();">Request</button>
+                    </div>
+                </div>
+                <br/>
+
+                <div>
+                    <div class="div_checkbox">
+                        <input id="grid" type="checkbox" onclick="showHeatMap(document.getElementById('grid').checked);"/>
+                        <label for="grid">Show grid</label>
+                    </div>
+                    <div class="div_checkbox">
+                        <input id="heat_map" type="checkbox" onclick="showHeatMap(document.getElementById('heat_map').checked);"/>
+                        <label for="heat_map">Show heat map</label>
+                    </div>
+                    <div class="div_checkbox">
+                        <input id="route" type="checkbox" onclick="showHeatMap(document.getElementById('route').checked);"/>
+                        <label for="route">Show route</label>
+                    </div>
+                    <div class="div_checkbox">
+                        <input id="points" type="checkbox" onclick="showHeatMap(document.getElementById('points').checked);"/>
+                        <label for="points">Show points</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
