@@ -21,3 +21,11 @@
 
 en:
   hello: "Hello world"
+  messages:
+    errors:
+      http_response:
+        success: "Success"
+        unknow_error: "Unexpected error: "
+        error_mis_param: "Parâmetros não informados: "
+        line_not_found: "Linha não encontrada"
+        bus_not_found: "Ônibus não encontrado"

@@ -12,6 +12,15 @@ Rails.application.routes.draw do
           get :with_line_stops_positions_and_speed_avg
         end
       end
+
+      resources :contatos, :only => [] do
+        collection do
+          get :all
+          get :fetch
+          get :insert
+          get :atualiza
+        end
+      end
       resources :line_positions, :only => [] do
         collection do
           get :from_line
@@ -34,7 +43,7 @@ Rails.application.routes.draw do
     end
   end
 
-  root 'application#index'
+  root 'heat_maps#position'
 
 
   # The priority is based upon order of creation: first created -> highest priority.

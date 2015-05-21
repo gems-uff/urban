@@ -1,272 +1,95 @@
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+<%= render :partial => 'scripts' %>
 
 <div class="page-header">
-  <h1><%= t '.title', :default => "Speed Heatmap" %></h1>
+  <h1><%= t '.title', :default => "Speed Heat Map" %></h1>
 </div>
 
 
-<%=render :partial => 'filter'%>
+<%= render :partial => 'filter' %>
 
 <div class="row">
   <div id="map-canvas" style="height: 500px; width: 100%"></div>
 </div>
 
-<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
-
 
 <script>
-    var map, mc, heatmap;
-    var mcOptions = {
-        gridSize: 50,
-        maxZoom: 15
-    };
-
-
-    function initialize() {
-        var mapOptions = {
-            zoom: 11,
-            center: new google.maps.LatLng(-22.9444308, -43.3841082),
-            mapTypeControl: true,
-            mapTypeControlOptions: {
-                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
-            },
-            navigationControl: true,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-
-        mc = new MarkerClusterer(map, [], mcOptions);
-
-        heatmap = new google.maps.visualization.HeatmapLayer({
-        });
-
-        heatmap.setMap(map);
-
-    }
-    var fp = []
-
-    var flightPath = new google.maps.Polyline({
-        path: fp,
-        strokeColor: "#000000",
-        strokeOpacity: 1.0,
-        strokeWeight: 4
-    });
-
-    // Add a polyline to the map and push to the array.
-    function addPolyline(lat, long) {
-        var polyline = new google.maps.LatLng(lat, long);
-        fp.push(polyline);
-    }
-
-
-    // Removes the fp from the map, but keeps them in the array.
-    function clearPolylines() {
-        flightPath.setMap(null)
-    }
-
-    // Shows any fp currently in the array.
-    function showPolylines() {
-        flightPath.setPath(fp);
-        flightPath.setMap(map);
-        var bounds = new google.maps.LatLngBounds();
-        for (var i = 0; i < fp.length; i++) {
-            bounds.extend(fp[i]);
-        }
-        map.fitBounds(bounds);
-    }
-
-    // Deletes all fp in the array by removing references to them.
-    function deletePolylines() {
-        clearPolylines();
-        fp = [];
-    }
-
-
-    $(function () {
-        var availableLines = <%= raw @lines.to_json %>;
-        $("#line").autocomplete({
-            source: availableLines,
-            select: function (event, ui) {
-                line = this.value
-                $("#form").submit();
-            }
-        });
-
-
-    });
-
-    var line;
-
-    $("#form").submit(function (e) {
+    $("form").submit(function (e) {
         e.preventDefault();
-        if (line == null)
-            line = $("#line").val();
-
-        $.get('<%=with_line_stops_positions_and_speed_avg_api_v1_bus_positions_path%>', { line: line, format: 'json' })
+        buildVariables();
+        $.get('<%=with_line_stops_positions_and_speed_avg_api_v1_bus_positions_path%>', {  line: line, dow: dow, date: date,
+            time_end: time_end, time_begin: time_begin, diff: {dow: dow_diff, date: date_diff, time_end: time_end_diff,
+                time_begin: time_begin_diff}, format: 'json'})
                 .done(function (data) {
-                    positions = data.positions
-                    stops = data.stops
-                    bus_positions = data.data
 
-                    heatmap.setMap(null);
-                    deleteMarkers();
-                    deletePolylines();
-                    for (var i = 0; i < positions.length; i++) {
-                        addPolyline(positions[i][1], positions[i][0]);
-                    }
+                    prepareMap(data);
+
                     for (var i = 0; i < stops.length; i++) {
-                        addMarker(new google.maps.LatLng(stops[i][1], stops[i][0]));
+                        addMarker(new google.maps.LatLng(stops[i]['latitude'], stops[i]['longitude']));
                     }
-                    for (var i = 0; i < bus_positions.length; i++) {
-                        heatmapPoints.push({location: new google.maps.LatLng(bus_positions[i][1], bus_positions[i][0]), weight: bus_positions[i][2]});
+
+                    if (bus_positions.length == 0) {
+                        alert("Cannot found any data by the filter parameters")
                     }
+                    else {
+                        for (var i = 0; i < bus_positions.length - 1; i++) {
+                            var color = "#ff4d4d"
+                            var speed = bus_positions[i][2];
+                            if ($('#diff').hasClass('active')) {
+                                //speed diff
+                                if (speed > 20) {
+                                    color = "#00cd00"
+                                } else if (speed > 5 && speed < 20) {
+                                    color = "#ffff4d"
+                                } else if (speed > -5 && speed < 5)
+                                    color = "#000000"
+                                if (speed < -5 && speed > -20) {
+                                    color = "#ffc04d"
+                                }
+                            }
+                            else {
+                                //actual speed
+                                if (speed > 60) {
+                                    color = "#00cd00"
+                                } else if (speed > 30 && speed < 60) {
+                                    color = "#ffff4d"
+                                } else if (speed > 15 && speed < 30) {
+                                    color = "#ffc04d"
+                                }
+                                else if (speed < 0) {
+                                    color = "#000000"
+                                }
+                            }
+
+                            var fp = [new google.maps.LatLng(bus_positions[i][1], bus_positions[i][0]),
+                                new google.maps.LatLng(bus_positions[i + 1][1], bus_positions[i + 1][0])]
+                            var flightPath = new google.maps.Polyline({
+                                path: fp,
+                                strokeColor: color,
+                                strokeOpacity: 1.0,
+                                strokeWeight: 5
+                            });
+                            polylines.push(flightPath);
+                            flightPath.setMap(map);
+
+
+                            baseHeatmapPoints.push({location: new google.maps.LatLng(bus_positions[i][1],
+                                    bus_positions[i][0]), weight: 1});
+                        }
+                    }
+
                     showPolylines();
 
                     if ($('input[name="show_stops"]').bootstrapSwitch('state')) {
-                        showMarkers();
-                    }else{
+                        showMarkers(false);
+                    } else {
                         clearMarkers();
                     }
-                    var pointArray = new google.maps.MVCArray(heatmapPoints);
 
-
-                    heatmap = new google.maps.visualization.HeatmapLayer({
-                        data: pointArray,
-                        gradient:[
-                            'rgba(255, 0, 0, 0)',
-                            'rgba(255, 17, 0, 1)',
-                            'rgba(255, 35, 0, 1)',
-                            'rgba(255, 52, 0, 1)',
-                            'rgba(255, 70, 0, 1)',
-                            'rgba(255, 87, 0, 1)',
-                            'rgba(255, 105, 0, 1)',
-                            'rgba(255, 123, 0, 1)',
-                            'rgba(255, 140, 0, 1)',
-                            'rgba(255, 158, 0, 1)',
-                            'rgba(255, 175, 0, 1)',
-                            'rgba(255, 193, 0, 1)',
-                            'rgba(255, 211, 0, 1)',
-                            'rgba(255, 228, 0, 1)',
-                            'rgba(255, 246, 0, 1)',
-                            'rgba(247, 255, 0, 1)',
-                            'rgba(229, 255, 0, 1)',
-                            'rgba(212, 255, 0, 1)',
-                            'rgba(194, 255, 0, 1)',
-                            'rgba(176, 255, 0, 1)',
-                            'rgba(159, 255, 0, 1)',
-                            'rgba(141, 255, 0, 1)',
-                            'rgba(124, 255, 0, 1)',
-                            'rgba(106, 255, 0, 1)',
-                            'rgba(88, 255, 0, 1)',
-                            'rgba(71, 255, 0, 1)',
-                            'rgba(53, 255, 0, 1)',
-                            'rgba(36, 255, 0, 1)',
-                            'rgba(18, 255, 0, 1)',
-                            'rgba(0, 255, 0, 1)'
-                        ],
-                        maxIntensity: 100
-                    });
-                    heatmap.setMap(map);
                     line = null;
                 });
-    });
+    })
+    ;
 
-
-    var markers = []
-
-    var heatmapPoints = [];
-
-
-
-    // Add a marker to the map and push to the array.
-    function addMarker(location) {
-        var marker = new google.maps.Marker({
-            position: location,
-            map: map,
-            icon: new google.maps.MarkerImage('<%=asset_path 'bus_arrow.png'%>'),
-            zIndex: Math.round(location.lat() * -100000) << 5
-        });
-
-        markers.push(marker);
-
-
-    }
-
-    // Sets the map on all markers in the array.
-    function setAllMap(map) {
-        for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(map);
-        }
-    }
-
-    // Removes the markers from the map, but keeps them in the array.
-    function clearMarkers() {
-        setAllMap(null);
-        mc.clearMarkers();
-
-    }
-
-    // Shows any markers currently in the array.
-    function showMarkers() {
-        setAllMap(map);
-        var bounds = new google.maps.LatLngBounds();
-        for (var i = 0; i < markers.length; i++) {
-            bounds.extend(markers[i].position);
-        }
-        mc = new MarkerClusterer(map, markers, mcOptions);
-        map.fitBounds(bounds);
-    }
-
-    // Deletes all markers in the array by removing references to them.
-    function deleteMarkers() {
-        clearMarkers();
-        markers = [];
-    }
-
-    $('input[name="show_stops"]').bootstrapSwitch();
-    $('input[name="show_stops"]').on('switchChange.bootstrapSwitch', function(event, state) {
-        if (state) {
-            showMarkers();
-        } else {
-            clearMarkers();
-        }
-    });
-
-
-
-    function toggleHeatmap() {
-        heatmap.setMap(heatmap.getMap() ? null : map);
-    }
-
-    function changeGradient() {
-        var gradient = [
-            'rgba(0, 255, 255, 0)',
-            'rgba(0, 255, 255, 1)',
-            'rgba(0, 191, 255, 1)',
-            'rgba(0, 127, 255, 1)',
-            'rgba(0, 63, 255, 1)',
-            'rgba(0, 0, 255, 1)',
-            'rgba(0, 0, 223, 1)',
-            'rgba(0, 0, 191, 1)',
-            'rgba(0, 0, 159, 1)',
-            'rgba(0, 0, 127, 1)',
-            'rgba(63, 0, 91, 1)',
-            'rgba(127, 0, 63, 1)',
-            'rgba(191, 0, 31, 1)',
-            'rgba(255, 0, 0, 1)'
-        ]
-        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
-    }
-
-    function changeRadius() {
-        heatmap.set('radius', heatmap.get('radius') ? null : 20);
-    }
-
-    function changeOpacity() {
-        heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
-    }
-
-    window.onload = initialize;
-
+    window.onload = initializeHeatMap;
 
 </script>

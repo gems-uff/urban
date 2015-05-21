@@ -6,12 +6,12 @@ class CreateLineStops < ActiveRecord::Migration
       t.integer :loaded_file_id, :references => LoadedFile
       t.string :description
       t.string :company
-      t.point :position, :geographic => true
+      #t.point :position, :geographic => true
 
       t.timestamps
 
     end
-    add_index :line_stops, :position
+    #add_index :line_stops, :position
     add_index :line_stops, :line_id
   end
 

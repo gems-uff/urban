@@ -1,0 +1,27 @@
+<script>
+    var fp = []
+
+    var flightPath = new google.maps.Polyline({
+        path: fp,
+        strokeColor: "#000000",
+        strokeOpacity: 1.0,
+        strokeWeight: 4
+    });
+
+    // Add a polyline to the map and push to the array.
+    function addPolyline(lat, long) {
+        var polyline = new google.maps.LatLng(lat, long);
+        fp.push(polyline);
+    }
+
+    // Removes the fp from the map, but keeps them in the array.
+    function clearPolylines() {
+        flightPath.setMap(null)
+    }
+
+    // Deletes all fp in the array by removing references to them.
+    function deletePolylines() {
+        clearPolylines();
+        fp = [];
+    }
+</script>

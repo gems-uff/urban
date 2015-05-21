@@ -1,0 +1,86 @@
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+<%= render :partial => 'map_scripts/markers' %>
+<%= render :partial => 'map_scripts/heat_map_polylines' %>
+<script>
+
+    var map, mc, heatmap;
+    var mcOptions = {
+        gridSize: 50,
+        maxZoom: 15
+    };
+
+    var hmGradient = [
+        'rgba(255, 0, 0, 0)',
+        'rgba(255, 17, 0, 1)',
+        'rgba(255, 35, 0, 1)',
+        'rgba(255, 52, 0, 1)',
+        'rgba(255, 70, 0, 1)',
+        'rgba(255, 87, 0, 1)',
+        'rgba(255, 105, 0, 1)',
+        'rgba(255, 123, 0, 1)',
+        'rgba(255, 140, 0, 1)',
+        'rgba(255, 158, 0, 1)',
+        'rgba(255, 175, 0, 1)',
+        'rgba(255, 193, 0, 1)',
+        'rgba(255, 211, 0, 1)',
+        'rgba(255, 228, 0, 1)',
+        'rgba(255, 246, 0, 1)',
+        'rgba(247, 255, 0, 1)',
+        'rgba(229, 255, 0, 1)',
+        'rgba(212, 255, 0, 1)',
+        'rgba(194, 255, 0, 1)',
+        'rgba(176, 255, 0, 1)',
+        'rgba(159, 255, 0, 1)',
+        'rgba(141, 255, 0, 1)',
+        'rgba(124, 255, 0, 1)',
+        'rgba(106, 255, 0, 1)',
+        'rgba(88, 255, 0, 1)',
+        'rgba(71, 255, 0, 1)',
+        'rgba(53, 255, 0, 1)',
+        'rgba(36, 255, 0, 1)',
+        'rgba(18, 255, 0, 1)',
+        'rgba(0, 255, 0, 1)'
+    ];
+
+    var hmGradient2 = ["rgba(0, 255, 0, 0)", "rgba(18, 255, 0, 1)", "rgba(36, 255, 0, 1)", "rgba(53, 255, 0, 1)", "rgba(71, 255, 0, 1)", "rgba(88, 255, 0, 1)", "rgba(106, 255, 0, 1)", "rgba(124, 255, 0, 1)", "rgba(141, 255, 0, 1)", "rgba(159, 255, 0, 1)", "rgba(176, 255, 0, 1)", "rgba(194, 255, 0, 1)", "rgba(212, 255, 0, 1)", "rgba(229, 255, 0, 1)", "rgba(247, 255, 0, 1)", "rgba(255, 246, 0, 1)", "rgba(255, 228, 0, 1)", "rgba(255, 211, 0, 1)", "rgba(255, 193, 0, 1)", "rgba(255, 175, 0, 1)", "rgba(255, 158, 0, 1)", "rgba(255, 140, 0, 1)", "rgba(255, 123, 0, 1)", "rgba(255, 105, 0, 1)", "rgba(255, 87, 0, 1)", "rgba(255, 70, 0, 1)", "rgba(255, 52, 0, 1)", "rgba(255, 35, 0, 1)", "rgba(255, 17, 0, 1)", "rgba(255, 0, 0, 1)"];
+
+    function initializeHeatMap() {
+        var mapOptions = {
+            zoom: 11,
+            center: new google.maps.LatLng(-22.9444308, -43.3841082),
+            mapTypeControl: true,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+            },
+            navigationControl: true,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+        mc = new MarkerClusterer(map, [], mcOptions);
+
+        baseHeatmap = new google.maps.visualization.HeatmapLayer({
+        });
+
+        baseHeatmap.setMap(map);
+
+        diffHeatmap = new google.maps.visualization.HeatmapLayer({
+        });
+
+        diffHeatmap.setMap(map);
+
+    }
+
+    $(function () {
+        var availableLines = <%= raw @lines.to_json %>;
+        $("#line").autocomplete({
+            source: availableLines,
+            select: function (event, ui) {
+                line = this.value
+                $("#form").submit();
+            }
+        });
+    });
+
+</script>

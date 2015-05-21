@@ -1,0 +1,56 @@
+<script>
+    var markers = []
+
+    // Add a marker to the map and push to the array.
+    function addMarker(location) {
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            icon: new google.maps.MarkerImage('<%=asset_path 'bus_arrow.png'%>'),
+            zIndex: Math.round(location.lat() * -100000) << 5
+        });
+
+        markers.push(marker);
+    }
+
+    // Sets the map on all markers in the array.
+    function setAllMap(map) {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
+        }
+    }
+
+    // Removes the markers from the map, but keeps them in the array.
+    function clearMarkers() {
+        setAllMap(null);
+        mc.clearMarkers();
+
+    }
+
+    // Shows any markers currently in the array.
+    function showMarkers(fitBounds) {
+        setAllMap(map);
+        if (fitBounds) {
+            var bounds = new google.maps.LatLngBounds();
+            for (var i = 0; i < markers.length; i++) {
+                bounds.extend(markers[i].position);
+            }
+            map.fitBounds(bounds);
+        }
+        mc = new MarkerClusterer(map, markers, mcOptions);
+    }
+
+    // Deletes all markers in the array by removing references to them.
+    function deleteMarkers() {
+        clearMarkers();
+        markers = [];
+    }
+
+    $('input[name="show_stops"]').on('switchChange.bootstrapSwitch', function (event, state) {
+        if (state) {
+            showMarkers();
+        } else {
+            clearMarkers();
+        }
+    });
+</script>

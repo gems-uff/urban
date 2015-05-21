@@ -6,11 +6,11 @@ class CreateLinePositions < ActiveRecord::Migration
       t.string :description
       t.string :company
       t.integer :loaded_file_id, :references => LoadedFile
-      t.point :position, :geographic => true
+      #t.point :position, :geographic => true
       t.integer :shape_id, :references => nil
       t.timestamps
     end
-    add_index :line_positions, :position
+    #add_index :line_positions, :position
     add_index :line_positions, :line_id
   end
 
