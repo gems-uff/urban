@@ -1,0 +1,23 @@
+<%= render :partial => 'map_scripts/polylines' %>
+
+<script>
+    // Shows any fp currently in the array.
+    function showPolylines() {
+        flightPath.setPath(fp);
+        flightPath.setMap(map);
+        var bounds = new google.maps.LatLngBounds();
+        if (baseHeatmapPoints.length == 0) {
+            for (var i = 0; i < fp.length; i++) {
+                bounds.extend(fp[i]);
+            }
+        } else {
+            for (var i = 0; i < baseHeatmapPoints.length; i++) {
+                if (baseHeatmapPoints[i].hasOwnProperty("location"))
+                    bounds.extend(baseHeatmapPoints[i]["location"]);
+                else
+                    bounds.extend(baseHeatmapPoints[i]);
+            }
+        }
+        map.fitBounds(bounds);
+    }
+</script>

@@ -2,6 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="" />
+    <mapping directory="$PROJECT_DIR$/../../dri" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../dri" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../dri" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../sai" vcs="svn" />
   </component>
 </project>
 

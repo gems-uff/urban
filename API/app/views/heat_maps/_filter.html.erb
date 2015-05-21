@@ -1,95 +1,110 @@
-<div class="col-md-12 row" style="margin-bottom: 30px; margin-top: 20px">
+<div role="tabpanel">
 
-  <form role="form" class="form-horizontal" id="form">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation"><a href="#query" aria-controls="query" role="tab" data-toggle="tab">Query</a></li>
+    <li role="presentation" class="active"><a href="#diff" aria-controls="diff" role="tab" data-toggle="tab">Diff</a>
+    </li>
+  </ul>
 
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="line" class="col-sm-5 control-label">Line number</label>
-
-        <div class="col-sm-7">
-          <input type="text" class="form-control input-sm" id="line" placeholder="Enter line number">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="show_stops" class="col-sm-5 control-label">Show stops</label>
-
-        <div class="col-sm-7">
-          <input id="show_stops" type="checkbox" name="show_stops" data-on-text="YES" data-off-text="NO" checked data-size="small" data-on-color="success" data-off-color="danger">
-        </div>
-      </div>
+  <!--Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane" id="query">
+      <%= render :partial => 'query' %>
     </div>
+    <div role="tabpanel" class="tab-pane active" id="diff"><%= render :partial => 'diff' %></div>
+  </div>
 
-    <div class="col-md-4">
-      <div class="form-group">
-        <label for="weekday-select" class="control-label col-md-4">Weekday</label>
-
-        <div class="col-md-1">
-          <input type="radio" name="query-type" value="weekday" class="vcenter" checked="checked">
-        </div>
-
-        <div class="col-md-7">
-          <%= select_tag :weekday, options_for_select(I18n.t(:'date.day_names').map.with_index { |d, index| [d, index] }),
-                         :prompt => 'Select a weekday', :class => 'form-control input-sm', :id => 'weekday-select' %>
-        </div>
-
-      </div>
-      <div class="form-group">
-        <label for="date" class="control-label col-md-4">Date</label>
-
-        <div class="col-md-1">
-          <input type="radio" name="query-type" class="vcenter" value="date">
-        </div>
-
-        <div class="col-md-7">
-          <input type="text" class="datepicker form-control input-sm" id="date-selection" placeholder="Choose a date">
-        </div>
-
-      </div>
-    </div>
-
-    <div class="col-md-5">
-      <div class="form-group">
-        <label for="slider" class="control-label col-md-3">Time range</label>
-
-        <div class="col-md-9">
-          <div id="slider" class="form-control"></div>
-        </div>
-      </div>
-
-    </div>
-
-    <input type="hidden" id="time_begin">
-    <input type="hidden" id="time_end">
-    <input type="hidden" id="date">
-    <input type="hidden" id="weekday">
-  </form>
 </div>
 
-
 <script>
-
-    $(function () {
-        $slider = $("#slider").slider({
-            range: true,
-            min: 0,
-            max: 24,
-            values: [ 0, 24 ]
-        });
-
-        $slider.slider("pips").slider("float", {});
-    });
-    $('.datepicker').datepicker();
-    $('#date-selection').prop('disabled', true);
-
-
-    $("input[name=query-type]").change(function () {
-        if ($(this).val() == 'weekday') {
-            $('#date-selection').prop('disabled', true);
-            $('#weekday-select').prop('disabled', false);
-        } else if ($(this).val() == 'date') {
-            $('#date-selection').prop('disabled', false);
-            $('#weekday-select').prop('disabled', true);
+    $(".stops-switch").bootstrapSwitch();
+    $('.stops-switch').on('switchChange.bootstrapSwitch', function(event, state) {
+        if (state) {
+            showMarkers();
+        } else {
+            clearMarkers();
         }
     });
+    $('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
+    $('.datepicker').prop('disabled', true);
+
+
+    var line;
+    var baseHeatmapPoints = [];
+    var dow = undefined;
+    var date = undefined;
+    var time_begin = undefined;
+    var time_end = undefined;
+    var dow_diff = undefined;
+    var date_diff = undefined;
+    var time_begin_diff = undefined;
+    var time_end_diff = undefined;
+    var polylines = [];
+    var positions = [];
+    var stops = [];
+    var bus_positions = [];
+
+    function buildVariables() {
+        if ($('#diff').hasClass('active')) {
+
+            if (line == null || line == "")
+                line = $("#line_diff").val();
+            if (!$('#day_of_week-select_diff_base').prop('disabled') && $('#day_of_week-select_diff_base').val() != "")
+                dow = $('#day_of_week-select_diff_base').val();
+            if (!$('#date-selection_diff_base').prop('disabled') && $('#date-selection_diff_base').val() != "")
+                date = $('#date-selection_diff_base').val();
+            time_begin = $("#time_begin_diff_base").val();
+            time_end = $("#time_end_diff_base").val();
+            if (time_begin == 0 && time_end == 24) {
+                time_begin = undefined;
+                time_end = undefined;
+            }
+
+            if (!$('#day_of_week-select_diff').prop('disabled') && $('#day_of_week-select_diff').val() != "")
+                dow_diff = $('#day_of_week-select_diff').val();
+            if (!$('#date-selection_diff').prop('disabled') && $('#date-selection_diff').val() != "")
+                date_diff = $('#date-selection_diff').val();
+            time_begin_diff = $("#time_begin_diff").val();
+            time_end_diff = $("#time_end_diff").val();
+            if (time_begin_diff == 0 && time_end_diff == 24) {
+                time_begin_diff = undefined;
+                time_end_diff = undefined;
+            }
+        } else {
+            dow_diff = undefined;
+            date_diff = undefined;
+            time_begin_diff = undefined;
+            time_end_diff = undefined;
+            if (line == null || line == "")
+                line = $("#line").val();
+            if (!$('#day_of_week-select').prop('disabled') && $('#day_of_week-select').val() != "")
+                dow = $('#day_of_week-select').val();
+            if (!$('#date-selection').prop('disabled') && $('#date-selection').val() != "")
+                date = $('#date-selection').val();
+            time_begin = $("#time_begin").val();
+            time_end = $("#time_end").val();
+            if (time_begin == 0 && time_end == 24) {
+                time_begin = undefined;
+                time_end = undefined;
+            }
+        }
+    }
+
+    function prepareMap(data) {
+        positions = data.positions
+        stops = data.stops
+        bus_positions = data.data
+
+        for (i = 0; i < polylines.length; i++) {
+            polylines[i].setMap(null);
+        }
+
+        baseHeatmap.setMap(null);
+        baseHeatmapPoints = [];
+        polylines = [];
+        deleteMarkers();
+        clearPolylines();
+    }
+
 </script>

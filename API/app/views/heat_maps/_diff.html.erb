@@ -1,0 +1,170 @@
+<div class="col-md-12 row" style="margin-bottom: 30px; margin-top: 20px">
+
+  <form role="form" class="form-horizontal" id="form_diff">
+
+    <div class="col-md-12 row" style="margin-bottom: 20px;">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="line_diff" class="col-sm-5 control-label">Line number</label>
+
+          <div class="col-sm-6">
+            <input type="text" class="form-control input-sm autocomplete-line" id="line_diff" placeholder="Enter line number">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="show_stops_diff" class="col-sm-4 control-label">Show stops</label>
+
+          <div class="col-sm-8">
+            <input id="show_stops_diff" type="checkbox" name="show_stops_diff" class="stops-switch" data-on-text="YES" data-off-text="NO" checked data-size="small" data-on-color="success" data-off-color="danger">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6" style="border-right: 1px solid #e1e1e8; padding:20px;">
+      <div class="col-md-11">
+        <div class="form-group" style="padding-top: 20px">
+          <label for="slider_diff_base" class="control-label col-md-3">Time range</label>
+
+          <div class="col-md-9">
+            <div id="slider_diff_base" class="form-control time-slider"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="day_of_week-select_diff_base" class="control-label col-md-4">Day of week</label>
+
+          <div class="col-md-1">
+            <input type="radio" name="query-type_diff_base" value="day_of_week_diff_base" class="vcenter dow-radio" checked="checked">
+          </div>
+
+          <div class="col-md-7">
+            <%= select_tag :day_of_week_diff_base, options_for_select(I18n.t(:'date.day_names').map.with_index { |d, index| [d, index] }),
+                           :prompt => 'Select a day of week', :class => 'form-control input-sm dow-select', :id => 'day_of_week-select_diff_base' %>
+          </div>
+
+        </div>
+        <div class="form-group">
+          <label for="date_diff_base" class="control-label col-md-4">Date</label>
+
+          <div class="col-md-1">
+            <input type="radio" name="query-type_diff_base" class="vcenter date-radio" value="date_diff_base">
+          </div>
+
+          <div class="col-md-7">
+            <input type="text" class="datepicker form-control input-sm" id="date-selection_diff_base" placeholder="Choose a date">
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 pull-right" style="padding:20px">
+      <div class="col-md-11">
+        <div class="form-group" style="padding-top: 20px">
+          <label for="slider_diff" class="control-label col-md-3">Time range</label>
+
+          <div class="col-md-9">
+            <div id="slider_diff" class="form-control time-slider"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="day_of_week-select_diff" class="control-label col-md-4">Day of week</label>
+
+          <div class="col-md-1">
+            <input type="radio" name="query-type_diff" value="day_of_week_diff" class="vcenter dow-radio" checked="checked">
+          </div>
+
+          <div class="col-md-7">
+            <%= select_tag :day_of_week_diff, options_for_select(I18n.t(:'date.day_names').map.with_index { |d, index| [d, index] }),
+                           :prompt => 'Select a day of week', :class => 'form-control input-sm dow-select', :id => 'day_of_week-select_diff' %>
+          </div>
+
+        </div>
+        <div class="form-group">
+          <label for="date_diff" class="control-label col-md-4">Date</label>
+
+          <div class="col-md-1">
+            <input type="radio" name="query-type_diff" class="vcenter date-radio" value="date_diff">
+          </div>
+
+          <div class="col-md-7">
+            <input type="text" class="datepicker form-control input-sm" id="date-selection_diff" placeholder="Choose a date">
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="clearfix"></div>
+    <div class="form-actions pull-right" style="margin-top: 30px;">
+      <button type="button" id="form-clear" style="margin-right: 10px" class="btn btn-warning btn-sm">Clear</button>
+      <input type="submit" id="form-submit" class="btn btn-primary btn-sm">
+
+      <div class="clearfix"></div>
+    </div>
+    <input type="hidden" id="time_begin_diff_base">
+    <input type="hidden" id="time_end_diff_base">
+    <input type="hidden" id="time_begin_diff">
+    <input type="hidden" id="time_end_diff">
+  </form>
+</div>
+
+<script>
+    $(function () {
+        $slider_diff = $("#slider_diff").slider({
+            range: true,
+            min: 0,
+            max: 24,
+            values: [ 0, 24 ],
+            slide: function( event, ui ) {
+                $("#time_begin_diff").val(ui.values[ 0 ])
+                $("#time_end_diff").val(ui.values[ 1 ])
+            }
+        });
+
+        $slider_diff.slider("pips").slider("float", {});
+
+        $slider_diff_base = $("#slider_diff_base").slider({
+            range: true,
+            min: 0,
+            max: 24,
+            values: [ 0, 24 ],
+            slide: function( event, ui ) {
+                $("#time_begin_diff_base").val(ui.values[ 0 ])
+                $("#time_end_diff_base").val(ui.values[ 1 ])
+            }
+        });
+
+        $slider_diff_base.slider("pips").slider("float", {});
+    });
+
+    $("#time_begin_diff_base").val(0);
+    $("#time_begin_diff").val(0);
+    $("#time_end_diff_base").val(24);
+    $("#time_end_diff").val(24);
+
+    $("input[name=query-type_diff_base]").change(function () {
+        if ($(this).val() == 'day_of_week_diff_base') {
+            $('#date-selection_diff_base').prop('disabled', true);
+            $('#day_of_week-select_diff_base').prop('disabled', false);
+        } else if ($(this).val() == 'date_diff_base') {
+            $('#date-selection_diff_base').prop('disabled', false);
+            $("#day_of_week-select_diff_base").prop('disabled', true);
+        }
+    });
+    $("input[name=query-type_diff]").change(function () {
+        if ($(this).val() == 'day_of_week_diff') {
+            $('#date-selection_diff').prop('disabled', true);
+            $('#day_of_week-select_diff').prop('disabled', false);
+        } else if ($(this).val() == 'date_diff') {
+            $('#date-selection_diff').prop('disabled', false);
+            $("#day_of_week-select_diff").prop('disabled', true);
+        }
+    });
+
+</script>
