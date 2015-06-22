@@ -18,10 +18,10 @@ import java.util.logging.Logger;
 public class PostgresDBConnection implements DBConnectionInterface {
 
     private static final String JDBC = "postgresql";
-    private static final String DATABASE = "//localhost:5432/bus_data2_development";
+    private static final String DATABASE = "//localhost:5432/bus_data_new_filters_development";
     private static final String USER = "schettino";
     private static final String PASSWORD = "";
-    private static final String ADAPTER_CLASS_NAME = "com.mysql.jdbc.Driver";
+    private static final String ADAPTER_CLASS_NAME = "org.postgresql.Driver";
 
     @Override
     public String getJDBC() {
@@ -50,7 +50,7 @@ public class PostgresDBConnection implements DBConnectionInterface {
 
     @Override
     public Connection dbConection() {
-        try {
+        try {            
             Class.forName(this.getAdapterClassName());
             String connectionUrl = "jdbc:" + this.getJDBC() + ":" + this.getDatabase();
 

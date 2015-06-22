@@ -5,6 +5,7 @@
  */
 package br.uff.bus_data.dbHelpers;
 
+import br.uff.bus_data.dao.AbstractDAO;
 import br.uff.bus_data.dao.LoadedFileDAO;
 import br.uff.bus_data.helper.Constants;
 import java.sql.SQLException;
@@ -34,7 +35,7 @@ public class LoadedFileDBUtils {
         return params;
     }
 
-    public static void finishSuccessfully(LoadedFileDAO ufDao, Long uploadedFileId) throws SQLException {
+    public static void finishSuccessfully(AbstractDAO ufDao, Long uploadedFileId) throws SQLException {
         Map<String, String> params = new HashMap<String, String>();
         SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
         Date d = new Date();
@@ -43,7 +44,7 @@ public class LoadedFileDBUtils {
         ufDao.update(params, uploadedFileId);
     }
 
-    public static void finishWithErrors(LoadedFileDAO ufDao, Long uploadedFileId, String errors) throws SQLException {
+    public static void finishWithErrors(AbstractDAO ufDao, Long uploadedFileId, String errors) throws SQLException {
         Map<String, String> params = new HashMap<String, String>();
         SimpleDateFormat dt = new SimpleDateFormat(Constants.DB_DATE_FORMAT);
         Date d = new Date();

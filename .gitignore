@@ -4,4 +4,9 @@ __pycache__
 /Extractor/src/br/uff/bus_data/helper/DBConnection.java
 /Extractor/dist/
 /Extractor/jsons/
+/Extractor/zips/
+/Extractor/stops/
+/Extractor/line positions/
+/Extractor/build/
 /API/tmp/cache/
+/Extractor/nbproject/private/

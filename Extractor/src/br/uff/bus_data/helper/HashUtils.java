@@ -46,7 +46,7 @@ public class HashUtils {
         return ordensHash;
     }
 
-    public static Map<String, BusPosition> loadPosicoes(Statement stmt) throws SQLException {
+    public static Map<String, List<BusPosition>> loadPosicoes(Statement stmt) throws SQLException {
         BusPositionDAO busPositionDao = new BusPositionDAO();
         busPositionDao.setStatement(stmt);
         return busPositionDao.selectUltimasPosicoes();

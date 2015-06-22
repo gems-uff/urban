@@ -1,15 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.uff.bus_data;
 
-import br.uff.bus_data.dao.LoadedFileDAO;
-import br.uff.bus_data.dao.BusPositionDAO;
-import br.uff.bus_data.dao.DisposalDAO;
 import br.uff.bus_data.dao.LineDAO;
 import br.uff.bus_data.dao.BusDAO;
+import br.uff.bus_data.dao.DAOContainer;
 import br.uff.bus_data.dbConnection.DBConnectionInterface;
 import br.uff.bus_data.dbConnection.PostgresDBConnection;
 import br.uff.bus_data.dbHelpers.LoadedFileDBUtils;
@@ -17,6 +10,7 @@ import br.uff.bus_data.dbHelpers.BusPositionDBUtils;
 import br.uff.bus_data.dbHelpers.IndexesDBUtils;
 import br.uff.bus_data.dbHelpers.LineDBUtils;
 import br.uff.bus_data.dbHelpers.BusDBUtils;
+import br.uff.bus_data.helper.BusPositionContainer;
 import br.uff.bus_data.helper.Constants;
 import br.uff.bus_data.helper.DeleteDirectory;
 import br.uff.bus_data.helper.FileFinder;
@@ -40,132 +34,39 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- *
- * @author schettino
- */
 public class ImportBusPositions {
 
     private static Long loadedFileId;
     private static Long lineId;
     private static Long busId;
+    private static Connection con;
+    private static Statement stmt;
+    private static JSONParser parser;
+    private static Map<String, Long> linesHash;
+    private static Map<String, Long> busesHash;
+    private static BusPositionContainer busPositionsHash;
+    private static List<Map<String, String>> insertParamsPositions;
+    private static List<Map<String, String>> insertParamsDispolsals;
+    private static DAOContainer daoContainer;
 
     public static void main(String[] args) throws FileNotFoundException {
-
         try {
-            DBConnectionInterface dbCon = new PostgresDBConnection();
-            Connection con = dbCon.dbConection();
-            Statement stmt = null;
-            con.setAutoCommit(false);
-            stmt = con.createStatement();
-            JSONParser parser = new JSONParser();
-
-            Map<String, Long> linesHash = HashUtils.loadLinhas(stmt); 
-            Map<String, Long> busesHash = HashUtils.loadOrdens(stmt);
-            Map<String, BusPosition> busPositionsHash = HashUtils.loadPosicoes(stmt);
-            List<Map<String, String>> insertParamsPositions = new ArrayList<Map<String, String>>();
-            List<Map<String, String>> insertParamsDispolsals = new ArrayList<Map<String, String>>();
-
-            LoadedFileDAO loadedFileDao = new LoadedFileDAO();
-            loadedFileDao.setStatement(stmt);
-            LineDAO lineDao = new LineDAO();
-            lineDao.setStatement(stmt);
-            BusDAO busDao = new BusDAO();
-            busDao.setStatement(stmt);
-            BusPositionDAO busPositionDao = new BusPositionDAO();
-            busPositionDao.setStatement(stmt);
-            DisposalDAO disposalDao = new DisposalDAO();
-            disposalDao.setStatement(stmt);
-
-            IndexesDBUtils.dropIndexes(stmt, con);
+            initialize();
 
             File currentDirFile = new File("");
-            String projRoot = currentDirFile.getAbsolutePath();
-            String zipsPath = projRoot + "/zips";
+            String zipsPath = currentDirFile.getAbsolutePath() + "/zips";
             File[] zips = FileFinder.finder(zipsPath, ".zip");
             Arrays.sort(zips);
 
             for (File zip : zips) {
                 String zipName = zip.getName().replaceFirst("[.][^.]+$", "");
-
                 UnZip.unZip(zip.getAbsolutePath(), zipsPath + File.separator + zipName);
-
-                File[] files = FileFinder.finder(zipsPath + File.separator + zipName, ".json");
+                File[] files = FileFinder.finder(zipsPath + File.separator + zipName + "/tmp", ".json");
                 Arrays.sort(files);
-
+                System.out.println("Jsons: " + files.length);
                 for (File file : files) {
                     if (file.isFile()) {
-                        try {
-                            loadedFileId = loadedFileDao.insert(LoadedFileDBUtils.insertDefaultParams(file.getName(), LoadedFile.TYPE_BUS_POSITIONS));
-                            JSONObject rootObject = (JSONObject) parser.parse(new FileReader(file.getAbsoluteFile()));
-                            ArrayList<String> columns = (ArrayList<String>) rootObject.get(Constants.KEY_COLUMNS);
-                            for (int i = 0; i < columns.size(); i++) {
-                                if (!columns.get(i).equals(Constants.COLUMNS[i])) {
-                                    LoadedFileDBUtils.finishWithErrors(loadedFileDao, loadedFileId, Constants.MSG_ERROR_COLUMNS);
-                                    return;
-                                }
-                            }
-                            ArrayList<Object> dataSet = (ArrayList<Object>) rootObject.get(Constants.KEY_DATA);
-                            for (int i = 0; i < dataSet.size(); i++) {
-                                ArrayList<Object> data = (ArrayList<Object>) dataSet.get(i);
-                                lineId = LineDBUtils.findOrInsertLine(lineDao,
-                                        String.valueOf(data.get(Constants.INDEX_LINE)),
-                                        linesHash);
-
-                                String busNumber = String.valueOf(data.get(Constants.INDEX_BUS_NUMBER));
-                                busId = BusDBUtils.insertBus(busDao, busNumber,
-                                        busesHash);
-
-                                BusPosition currentPosition = busPositionsHash.get(busNumber);
-                                BusPosition newPosition = BusPosition.fromJsonFile(data, lineId, busId, loadedFileId);
-                                HashMap<String, String> params = BusPositionDBUtils.generateParams(newPosition);
-
-                                if ((currentPosition != null)) {
-                                    String disposalReason = currentPosition.motivoDescarte(newPosition);
-                                    if (disposalReason == null) {
-                                        insertParamsPositions.add(params);
-//                                        Long dadoId = dadoRJDao.insert(params);
-//                                        novoDado.setId(dadoId);
-                                        busPositionsHash.put(busNumber, newPosition);
-                                    } else {
-                                        params.put("disposal_reason", "'" + disposalReason + "'");
-//                                        params.put("last_postion_id", String.valueOf(dadoAtual.getId()));
-                                        insertParamsDispolsals.add(params);
-//                                        descarteDao.insert(params);
-                                    }
-                                } else {
-                                    insertParamsPositions.add(params);
-//                                    Long dadoId = dadoRJDao.insert(params);
-//                                    novoDado.setId(dadoId);
-                                    busPositionsHash.put(busNumber, newPosition);
-                                }
-                            }
-                            busPositionDao.insert(insertParamsPositions);
-                            disposalDao.insert(insertParamsDispolsals);
-                            insertParamsPositions.clear();
-                            insertParamsDispolsals.clear();
-
-                            LoadedFileDBUtils.finishSuccessfully(loadedFileDao, loadedFileId);
-                            con.commit();
-                            System.out.println("file " + file.getName());
-                        } catch (IOException ex) {
-                            busPositionDao.insert(insertParamsPositions);
-                            disposalDao.insert(insertParamsDispolsals);
-                            insertParamsPositions.clear();
-                            insertParamsDispolsals.clear();
-                            LoadedFileDBUtils.finishWithErrors(loadedFileDao, loadedFileId, ex.getMessage());
-                            con.commit();
-                            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (ParseException ex) {
-                            busPositionDao.insert(insertParamsPositions);
-                            disposalDao.insert(insertParamsDispolsals);
-                            insertParamsPositions.clear();
-                            insertParamsDispolsals.clear();
-                            LoadedFileDBUtils.finishWithErrors(loadedFileDao, loadedFileId, ex.getMessage());
-                            con.commit();
-                            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
+                        importFile(file);
                     }
                 }
 
@@ -182,5 +83,97 @@ public class ImportBusPositions {
         } catch (SQLException e) {
             System.out.println("SQL Exception: " + e.toString());
         }
+    }
+
+    private static void initialize() throws SQLException {
+        DBConnectionInterface dbCon = new PostgresDBConnection();
+        con = dbCon.dbConection();
+        stmt = null;
+        con.setAutoCommit(false);
+        stmt = con.createStatement();
+        parser = new JSONParser();
+        linesHash = HashUtils.loadLinhas(stmt);
+        busesHash = HashUtils.loadOrdens(stmt);
+        busPositionsHash = new BusPositionContainer(HashUtils.loadPosicoes(stmt));
+        insertParamsPositions = new ArrayList<Map<String, String>>();
+        insertParamsDispolsals = new ArrayList<Map<String, String>>();
+        daoContainer = new DAOContainer(stmt);
+        IndexesDBUtils.dropIndexes(stmt, con);
+    }
+    
+    private static void importFile(File file) throws SQLException {
+        try {
+            loadedFileId = daoContainer.get(DAOContainer.LOADED_FILE).insert(LoadedFileDBUtils.insertDefaultParams(file.getName(), LoadedFile.TYPE_BUS_POSITIONS));
+            JSONObject rootObject = (JSONObject) parser.parse(new FileReader(file.getAbsoluteFile()));
+            ArrayList<String> columns = (ArrayList<String>) rootObject.get(Constants.KEY_COLUMNS);
+            if (!checkFileStructure(columns)) {
+                return;
+            }
+
+            ArrayList<Object> dataSet = (ArrayList<Object>) rootObject.get(Constants.KEY_DATA);
+            for (Object fileData : dataSet) {
+                ArrayList<Object> data = (ArrayList<Object>) fileData;
+                importData(data);
+            }
+            endLoadedFile();
+            LoadedFileDBUtils.finishSuccessfully(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId);
+            con.commit();
+            System.out.println("file " + file.getName());
+        } catch (IOException ex) {
+            endLoadedFile();
+            LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, ex.getMessage());
+            con.commit();
+            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            endLoadedFile();
+            LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, ex.getMessage());
+            con.commit();
+            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private static boolean checkFileStructure(ArrayList<String> columns) throws SQLException {
+        for (int i = 0; i < columns.size(); i++) {
+            if (!columns.get(i).equals(Constants.COLUMNS[i])) {
+                LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, Constants.MSG_ERROR_COLUMNS);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void importData(ArrayList<Object> data) throws SQLException {
+        lineId = LineDBUtils.findOrInsertLine((LineDAO) daoContainer.get(DAOContainer.LINE),
+                String.valueOf(data.get(Constants.INDEX_LINE)),
+                linesHash);
+
+        String busNumber = String.valueOf(data.get(Constants.INDEX_BUS_NUMBER));
+        busId = BusDBUtils.insertBus((BusDAO) daoContainer.get(DAOContainer.BUS), busNumber,
+                busesHash);
+
+        BusPosition currentPosition = busPositionsHash.getLast(busNumber);
+        BusPosition newPosition = BusPosition.fromJsonFile(data, lineId, busId, loadedFileId);
+        HashMap<String, String> params = BusPositionDBUtils.generateParams(newPosition);
+
+        if ((currentPosition != null)) {
+            String disposalReason = currentPosition.motivoDescarte(newPosition);
+            if (disposalReason == null) {
+                insertParamsPositions.add(params);
+                busPositionsHash.put(busNumber, newPosition);
+            } else {
+                params.put("disposal_reason", "'" + disposalReason + "'");
+                insertParamsDispolsals.add(params);
+            }
+        } else {
+            insertParamsPositions.add(params);
+            busPositionsHash.put(busNumber, newPosition);
+        }
+    }
+
+    private static void endLoadedFile() throws SQLException {
+        daoContainer.get(DAOContainer.BUS_POSITION).insert(insertParamsPositions);
+        daoContainer.get(DAOContainer.DISPOSAL).insert(insertParamsDispolsals);
+        insertParamsPositions.clear();
+        insertParamsDispolsals.clear();
     }
 }

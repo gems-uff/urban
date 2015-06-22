@@ -83,39 +83,6 @@ ALTER SEQUENCE buses_id_seq OWNED BY buses.id;
 
 
 --
--- Name: contatos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE contatos (
-    id integer NOT NULL,
-    name character varying(255),
-    email character varying(255),
-    telephone character varying(255),
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: contatos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE contatos_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: contatos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE contatos_id_seq OWNED BY contatos.id;
-
-
---
 -- Name: disposals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -320,13 +287,6 @@ ALTER TABLE ONLY buses ALTER COLUMN id SET DEFAULT nextval('buses_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY contatos ALTER COLUMN id SET DEFAULT nextval('contatos_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY disposals ALTER COLUMN id SET DEFAULT nextval('disposals_id_seq'::regclass);
 
 
@@ -372,14 +332,6 @@ ALTER TABLE ONLY bus_positions
 
 ALTER TABLE ONLY buses
     ADD CONSTRAINT buses_pkey PRIMARY KEY (id);
-
-
---
--- Name: contatos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY contatos
-    ADD CONSTRAINT contatos_pkey PRIMARY KEY (id);
 
 
 --
@@ -440,7 +392,7 @@ CREATE INDEX index_bus_positions_on_line_id ON bus_positions USING btree (line_i
 -- Name: index_bus_positions_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_bus_positions_on_position ON bus_positions USING gist ("position");
+CREATE INDEX index_bus_positions_on_position ON bus_positions USING btree ("position");
 
 
 --
@@ -482,7 +434,7 @@ CREATE INDEX index_disposals_on_line_id ON disposals USING btree (line_id);
 -- Name: index_disposals_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_disposals_on_position ON disposals USING gist ("position");
+CREATE INDEX index_disposals_on_position ON disposals USING btree ("position");
 
 
 --
@@ -560,6 +512,4 @@ INSERT INTO schema_migrations (version) VALUES ('20140414031450');
 INSERT INTO schema_migrations (version) VALUES ('20140922035218');
 
 INSERT INTO schema_migrations (version) VALUES ('20140922035534');
-
-INSERT INTO schema_migrations (version) VALUES ('20141215180720');
 
