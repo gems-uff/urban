@@ -77,9 +77,26 @@ public class BusPosition implements Comparable<BusPosition>, Mappable<String, St
         return false;
     }
 
-    public String motivoDescarte(BusPosition novo) {
-        if (this.time.compareTo(novo.time) >= 0) {
-            return "New position is prior to the current position";
+    public String motivoDescarte(BusPosition novo, Map<Long, LineBoundingBox> lineBoundingBoxHash) {
+        if ((novo.time == null) || (novo.speed == null)) {
+            return "Invalid data";
+        }
+
+        if (this.time.compareTo(novo.time) == 0) {
+            return "Repeated record";
+        }
+
+        if (this.speed > 120) {
+            return "Speed higher than 120 km/h";
+        }
+
+        if (this.lineId == null) {
+            return "Record without line";
+        }
+        LineBoundingBox lbb = lineBoundingBoxHash.get(this.lineId);
+
+        if ((lbb != null) && !lbb.isInside(novo)) {
+            return "Bus out of service";
         }
 
         if ((this.latitude != novo.latitude) || (this.longitude != novo.longitude)) {
@@ -87,9 +104,7 @@ public class BusPosition implements Comparable<BusPosition>, Mappable<String, St
                     this.longitude, novo.getLatitude(),
                     novo.getLongitude(), 'K');
             if (!Double.isNaN(distance)) {
-                if (distance < 0.015) {
-                    return "Distance is lower than 15 meters";
-                } else if (distance > 2.0 * DateHelper.minutesDiff(this.time, novo.time)) {
+                if (distance > 2.0 * DateHelper.minutesDiff(this.time, novo.time)) {
                     return "Distance is higher than 2 Kilometers";
                 }
             }
@@ -116,14 +131,18 @@ public class BusPosition implements Comparable<BusPosition>, Mappable<String, St
         if (!data.isEmpty()) {
             try {
                 date = dt.parse(data);
-            } catch (java.text.ParseException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         dado.time = date;
         dado.latitude = Double.valueOf(String.valueOf(params.get(Constants.INDEX_LATITUDE)));
         dado.longitude = Double.valueOf(String.valueOf(params.get(Constants.INDEX_LONGITUDE)));
-        dado.speed = Float.valueOf(String.valueOf(params.get(Constants.INDEX_SPEED)));
+        try {
+            dado.speed = Float.valueOf(String.valueOf(params.get(Constants.INDEX_SPEED)));
+        } catch (java.lang.IndexOutOfBoundsException ex) {
+            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Point p = new Point(dado.longitude, dado.latitude);
         p.setSrid(4326);
         dado.position = new PGgeometry(p);

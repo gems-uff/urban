@@ -11,8 +11,9 @@ class CreateDisposals < ActiveRecord::Migration
       t.string :disposal_reason, :null => false
       t.timestamps
     end
-    add_index :disposals, :position
+    ActiveRecord::Base.connection.execute('CREATE INDEX index_disposals_on_position ON disposals USING GIST (position)')
     add_index :disposals, :line_id
+    add_index :disposals, :disposal_reason
     add_index :disposals, :bus_id
     add_index :disposals, :time
   end

@@ -392,7 +392,7 @@ CREATE INDEX index_bus_positions_on_line_id ON bus_positions USING btree (line_i
 -- Name: index_bus_positions_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_bus_positions_on_position ON bus_positions USING btree ("position");
+CREATE INDEX index_bus_positions_on_position ON bus_positions USING gist ("position");
 
 
 --
@@ -424,6 +424,13 @@ CREATE INDEX index_disposals_on_bus_id ON disposals USING btree (bus_id);
 
 
 --
+-- Name: index_disposals_on_disposal_reason; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_disposals_on_disposal_reason ON disposals USING btree (disposal_reason);
+
+
+--
 -- Name: index_disposals_on_line_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -434,7 +441,7 @@ CREATE INDEX index_disposals_on_line_id ON disposals USING btree (line_id);
 -- Name: index_disposals_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_disposals_on_position ON disposals USING btree ("position");
+CREATE INDEX index_disposals_on_position ON disposals USING gist ("position");
 
 
 --
@@ -455,7 +462,7 @@ CREATE INDEX index_line_positions_on_line_id ON line_positions USING btree (line
 -- Name: index_line_positions_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_line_positions_on_position ON line_positions USING btree ("position");
+CREATE INDEX index_line_positions_on_position ON line_positions USING gist ("position");
 
 
 --
@@ -469,7 +476,7 @@ CREATE INDEX index_line_stops_on_line_id ON line_stops USING btree (line_id);
 -- Name: index_line_stops_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_line_stops_on_position ON line_stops USING btree ("position");
+CREATE INDEX index_line_stops_on_position ON line_stops USING gist ("position");
 
 
 --

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class PostgresDBConnection implements DBConnectionInterface {
 
     private static final String JDBC = "postgresql";
-    private static final String DATABASE = "//localhost:5432/bus_data_new_filters_development";
+    private static final String DATABASE = "//localhost:5432/bus_data_analysis";
     private static final String USER = "schettino";
     private static final String PASSWORD = "";
     private static final String ADAPTER_CLASS_NAME = "org.postgresql.Driver";
@@ -59,10 +59,10 @@ public class PostgresDBConnection implements DBConnectionInterface {
             ((org.postgresql.jdbc4.Jdbc4Connection) con).addDataType("geometry", "org.postgis.PGgeometry");
             return con;
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(MySQLDBConnection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PostgresDBConnection.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         } catch (SQLException ex) {
-            Logger.getLogger(MySQLDBConnection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PostgresDBConnection.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }

@@ -3,6 +3,7 @@ package br.uff.bus_data;
 import br.uff.bus_data.dao.LineDAO;
 import br.uff.bus_data.dao.BusDAO;
 import br.uff.bus_data.dao.DAOContainer;
+import br.uff.bus_data.dao.LineBoundingBoxDAO;
 import br.uff.bus_data.dbConnection.DBConnectionInterface;
 import br.uff.bus_data.dbConnection.PostgresDBConnection;
 import br.uff.bus_data.dbHelpers.LoadedFileDBUtils;
@@ -17,6 +18,7 @@ import br.uff.bus_data.helper.FileFinder;
 import br.uff.bus_data.helper.HashUtils;
 import br.uff.bus_data.helper.UnZip;
 import br.uff.bus_data.models.BusPosition;
+import br.uff.bus_data.models.LineBoundingBox;
 import br.uff.bus_data.models.LoadedFile;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,10 +46,12 @@ public class ImportBusPositions {
     private static JSONParser parser;
     private static Map<String, Long> linesHash;
     private static Map<String, Long> busesHash;
+    private static Map<Long, LineBoundingBox> lineBoundingBoxHash;
     private static BusPositionContainer busPositionsHash;
     private static List<Map<String, String>> insertParamsPositions;
     private static List<Map<String, String>> insertParamsDispolsals;
     private static DAOContainer daoContainer;
+    private static LineBoundingBoxDAO lineBoundingBoxDao;
 
     public static void main(String[] args) throws FileNotFoundException {
         try {
@@ -98,6 +102,9 @@ public class ImportBusPositions {
         insertParamsPositions = new ArrayList<Map<String, String>>();
         insertParamsDispolsals = new ArrayList<Map<String, String>>();
         daoContainer = new DAOContainer(stmt);
+        lineBoundingBoxDao = new LineBoundingBoxDAO();
+        lineBoundingBoxDao.setStatement(stmt);
+        lineBoundingBoxHash = lineBoundingBoxDao.all();
         IndexesDBUtils.dropIndexes(stmt, con);
     }
     
@@ -156,7 +163,7 @@ public class ImportBusPositions {
         HashMap<String, String> params = BusPositionDBUtils.generateParams(newPosition);
 
         if ((currentPosition != null)) {
-            String disposalReason = currentPosition.motivoDescarte(newPosition);
+            String disposalReason = currentPosition.motivoDescarte(newPosition, lineBoundingBoxHash);
             if (disposalReason == null) {
                 insertParamsPositions.add(params);
                 busPositionsHash.put(busNumber, newPosition);

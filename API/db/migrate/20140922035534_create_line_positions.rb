@@ -10,7 +10,7 @@ class CreateLinePositions < ActiveRecord::Migration
       t.integer :shape_id, :references => nil
       t.timestamps
     end
-    add_index :line_positions, :position
+    ActiveRecord::Base.connection.execute('CREATE INDEX index_line_positions_on_position ON line_positions USING GIST (position)')
     add_index :line_positions, :line_id
   end
 

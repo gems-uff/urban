@@ -13,14 +13,6 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :contatos, :only => [] do
-        collection do
-          get :all
-          get :fetch
-          get :insert
-          get :atualiza
-        end
-      end
       resources :line_positions, :only => [] do
         collection do
           get :from_line
@@ -28,6 +20,11 @@ Rails.application.routes.draw do
         end
       end
       resources :line_stops, :only => [] do
+        collection do
+          get :from_line
+        end
+      end
+      resources :line_bounding_box, :only => [] do
         collection do
           get :from_line
         end
@@ -42,6 +39,7 @@ Rails.application.routes.draw do
       get :speed
     end
   end
+  get '/statistics', :to => 'statistics#index', :as => 'statistics'
 
   root 'heat_maps#position'
 

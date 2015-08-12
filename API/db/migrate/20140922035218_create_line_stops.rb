@@ -11,7 +11,7 @@ class CreateLineStops < ActiveRecord::Migration
       t.timestamps
 
     end
-    add_index :line_stops, :position
+    ActiveRecord::Base.connection.execute('CREATE INDEX index_line_stops_on_position ON line_stops USING GIST (position)')
     add_index :line_stops, :line_id
   end
 

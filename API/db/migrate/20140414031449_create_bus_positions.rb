@@ -10,7 +10,7 @@ class CreateBusPositions < ActiveRecord::Migration
       t.timestamps
     end
     add_index :bus_positions, [:time, :bus_id], :unique => true
-    add_index :bus_positions, :position
+    ActiveRecord::Base.connection.execute('CREATE INDEX index_bus_positions_on_position ON bus_positions USING GIST (position)')
     add_index :bus_positions, :line_id
     add_index :bus_positions, :bus_id
     add_index :bus_positions, :time

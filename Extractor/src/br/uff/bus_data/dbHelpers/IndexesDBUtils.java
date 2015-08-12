@@ -36,6 +36,7 @@ public class IndexesDBUtils {
         dropIndex("index_disposals_on_bus_id");
         dropIndex("index_disposals_on_line_id");
         dropIndex("index_disposals_on_position");
+        dropIndex("index_disposals_on_disposal_reason");
 
         dropIndex("index_lines_on_line_number");
 
@@ -72,6 +73,12 @@ public class IndexesDBUtils {
 //        stmt.execute("DROP INDEX fk__disposals_last_postion_id ON disposals");
         System.out.println("Starting");
     }
+    public static void enos(Statement stmt, Connection con) throws SQLException {
+        stamt = stmt;
+        System.out.println("Re-creating indexes");
+         createSimpleIndex("index_disposals_on_disposal_reason", "disposals", new String[]{"disposal_reason"});
+        con.commit();
+    }
 
     public static void createIndexes(Statement stmt, Connection con) throws SQLException {
         stamt = stmt;
@@ -83,7 +90,7 @@ public class IndexesDBUtils {
 
         createUniqueIndex("index_loaded_files_on_start_time_and_filename", "loaded_files", new String[]{"start_time", "filename"});
 
-        createUniqueIndex("index_bus_positions_on_time_and_bus_id", "bus_positions", new String[]{"time", "bus_id"});
+        createSimpleIndex("index_bus_positions_on_time_and_bus_id", "bus_positions", new String[]{"time", "bus_id"});
         createSimpleIndex("index_bus_positions_on_time", "bus_positions", new String[]{"time"});
         createSimpleIndex("index_bus_positions_on_bus_id", "bus_positions", new String[]{"bus_id"});
         createSimpleIndex("index_bus_positions_on_line_id", "bus_positions", new String[]{"line_id"});
@@ -94,6 +101,7 @@ public class IndexesDBUtils {
         createSimpleIndex("index_disposals_on_time", "disposals", new String[]{"time"});
         createSimpleIndex("index_disposals_on_bus_id", "disposals", new String[]{"bus_id"});
         createSimpleIndex("index_disposals_on_line_id", "disposals", new String[]{"line_id"});
+        createSimpleIndex("index_disposals_on_disposal_reason", "disposals", new String[]{"disposal_reason"});
         con.commit();
         createSpartialIndex("index_disposals_on_position", "disposals", new String[]{"position"});
         con.commit();
@@ -168,6 +176,7 @@ public class IndexesDBUtils {
         }
         query = query.substring(0, query.length() - 1);
         query += ")";
+        System.out.println("Query index " + query);
         stamt.execute(query);
         System.out.println(indexName + " OK");
     }

@@ -53,8 +53,12 @@ public class BusPositionContainer {
     }
 
     public BusPosition getLast(String busNumber) {
-        if (busPositions.containsKey(busNumber)) {
-            return busPositions.get(busNumber).get(0);
+        try {
+            if (busPositions.containsKey(busNumber)) {
+                return busPositions.get(busNumber).get(0);
+            }
+        } catch (java.lang.IndexOutOfBoundsException e) {
+            System.out.println("oiee");
         }
         return null;
     }

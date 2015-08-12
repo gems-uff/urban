@@ -1,0 +1,178 @@
+<div class="page-header">
+  <h1><%= t '.title', :default => 'Statistics' %></h1>
+</div>
+
+<%= render :partial => 'filter' %>
+
+<div class="row">
+  <div id="primaryChart" style="height: 500px; width: 100%"></div>
+  <div id="secondaryChart" style="height: 500px; width: 100%; display: none"></div>
+</div>
+
+<script>
+    $(function () {
+
+        $(document).ready(function () {
+            var primaryChartDiv = $('#primaryChart');
+            var secondaryChartDiv = $('#secondaryChart');
+            var primaryChartData = <%= raw @data %>
+//            var primaryChartData = [
+//                ["Valid Data", 3847118],
+//                ["New position is prior to the current position", 1428501],
+//                ["Distance is higher than 2 Kilometers", 729706],
+//                ["Distance is lower than 15 meters", 3761583]
+//            ]
+
+            var primaryChartOptions = {
+                chart: {
+                    renderTo: 'primaryChart',
+                    type: 'pie'
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: '<b>{point.y} ({point.percentage:.1f}%)</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true
+                        },
+                        showInLegend: true
+                    }
+                },
+
+                series: [
+                    {
+
+                        point: {
+                            events: {
+                                click: function (event) {
+                                    createSecondaryChart([1, 5, 3, 4, 2, 5, 6], [6, 2, 4, 3, 5, 2, 1], ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' ], this.name)
+                                }
+                            }
+                        },
+                        data: primaryChartData
+                    }
+                ]
+            }
+
+            createPrimaryChart(primaryChartOptions);
+
+            function createSecondaryChart(data1, data2, categories, title) {
+                secondaryChartDiv.show();
+                secondaryChartDiv.highcharts({
+                    chart: {
+                        zoomType: 'xy'
+//                        type: 'column'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        categories: categories,
+                        title: {
+                            text: null
+                        }
+                    },
+
+                    yAxis: [{ // Primary yAxis
+                        labels: {
+                            format: '{value} km/h',
+                            style: {
+                                color: Highcharts.getOptions().colors[1]
+                            }
+                        },
+                        title: {
+                            text: 'Average Speed',
+                            style: {
+                                color: Highcharts.getOptions().colors[1]
+                            }
+                        }
+                    }, { // Secondary yAxis
+                        title: {
+                            text: 'Average Count',
+                            style: {
+                                color: Highcharts.getOptions().colors[0]
+                            }
+                        },
+                        labels: {
+                            format: '{value}',
+                            style: {
+                                color: Highcharts.getOptions().colors[0]
+                            }
+                        },
+                        opposite: true
+                    }],
+                    tooltip: {
+                        shared: true
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'left',
+                        x: 120,
+                        verticalAlign: 'top',
+                        y: 100,
+                        floating: true,
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+                    },
+                    series: [{
+                        name: 'Average Speed',
+                        type: 'column',
+                        yAxis: 1,
+                        data: data1,
+                        tooltip: {
+                            valueSuffix: ' Km/h'
+                        }
+
+                    }, {
+                        name: 'Average Count',
+                        type: 'spline',
+                        data: data2
+
+                    }],
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                enabled: true
+                            }
+                        },
+                        series: {
+                            cursor: 'pointer',
+                            point: {
+                                events: {
+                                    click: function () {
+                                        returnToPrimaryChart();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                $('#select-chart-type').hide();
+                primaryChartDiv.hide();
+            }
+
+            function createPrimaryChart(options){
+               new Highcharts.Chart(options);
+            }
+            function returnToPrimaryChart(){
+                createPrimaryChart(primaryChartOptions);
+                secondaryChartDiv.hide();
+                primaryChartDiv.show();
+                $('#select-chart-type').show();
+            }
+
+            window.changeChartType = function(newType){
+                primaryChartOptions.chart.renderTo = 'primaryChart';
+                primaryChartOptions.chart.type = newType;
+                createPrimaryChart(primaryChartOptions);
+            }
+
+        });
+
+    });
+</script>
