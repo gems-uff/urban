@@ -20,6 +20,7 @@ import br.uff.bus_data.helper.UnZip;
 import br.uff.bus_data.models.BusPosition;
 import br.uff.bus_data.models.LineBoundingBox;
 import br.uff.bus_data.models.LoadedFile;
+import corrector.Corrector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -52,6 +53,7 @@ public class ImportBusPositions {
     private static List<Map<String, String>> insertParamsDispolsals;
     private static DAOContainer daoContainer;
     private static LineBoundingBoxDAO lineBoundingBoxDao;
+    private static Corrector corretor;
 
     public static void main(String[] args) throws FileNotFoundException {
         try {
@@ -106,6 +108,8 @@ public class ImportBusPositions {
         lineBoundingBoxDao.setStatement(stmt);
         lineBoundingBoxHash = lineBoundingBoxDao.all();
         IndexesDBUtils.dropIndexes(stmt, con);
+        corretor = new Corrector(new File("line positions"));
+        corretor.processaRotas();
     }
     
     private static void importFile(File file) throws SQLException {
@@ -150,6 +154,7 @@ public class ImportBusPositions {
     }
 
     private static void importData(ArrayList<Object> data) throws SQLException {
+        corretor.alinharDados(50.0, 50.0, data);
         lineId = LineDBUtils.findOrInsertLine((LineDAO) daoContainer.get(DAOContainer.LINE),
                 String.valueOf(data.get(Constants.INDEX_LINE)),
                 linesHash);
