@@ -24,7 +24,9 @@ import org.postgis.Point;
  * @author schettino
  */
 public class BusPosition implements Comparable<BusPosition>, Mappable<String, String> {
-
+    private static final float MAX_SPEED = (float) 85.57;
+    private static final float MAX_DISTANCE = (float) 1.43;
+    
     Long id;
     Long loadedFileId;
     Long lineId;
@@ -86,8 +88,8 @@ public class BusPosition implements Comparable<BusPosition>, Mappable<String, St
             return "Repeated record";
         }
 
-        if (this.speed > 120) {
-            return "Speed higher than 120 km/h";
+        if (this.speed > MAX_SPEED) {
+            return "Speed higher than " + MAX_SPEED + " km/h";
         }
 
         if (this.lineId == null) {
@@ -104,8 +106,8 @@ public class BusPosition implements Comparable<BusPosition>, Mappable<String, St
                     this.longitude, novo.getLatitude(),
                     novo.getLongitude(), 'K');
             if (!Double.isNaN(distance)) {
-                if (distance > 2.0 * DateHelper.minutesDiff(this.time, novo.time)) {
-                    return "Distance is higher than 2 Kilometers";
+                if (distance > MAX_DISTANCE * DateHelper.minutesDiff(this.time, novo.time)) {
+                    return "Distance is higher than " + MAX_DISTANCE + " Kilometers";
                 }
             }
 
