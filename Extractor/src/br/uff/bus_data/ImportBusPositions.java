@@ -38,6 +38,7 @@ import org.json.simple.parser.ParseException;
 
 public class ImportBusPositions {
 
+    private static final boolean USE_DISPOSALS = false;
     private static Long loadedFileId;
     private static Long lineId;
     private static Long busId;
@@ -80,7 +81,7 @@ public class ImportBusPositions {
                     Logger.getLogger(UnZip.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            IndexesDBUtils.createIndexes(stmt, con);
+            IndexesDBUtils.createIndexes(stmt, con, USE_DISPOSALS);
 
             stmt.close();
             con.close();
@@ -105,9 +106,9 @@ public class ImportBusPositions {
         lineBoundingBoxDao = new LineBoundingBoxDAO();
         lineBoundingBoxDao.setStatement(stmt);
         lineBoundingBoxHash = lineBoundingBoxDao.all();
-        IndexesDBUtils.dropIndexes(stmt, con);
+        IndexesDBUtils.dropIndexes(stmt, con, USE_DISPOSALS);
     }
-    
+
     private static void importFile(File file) throws SQLException {
         try {
             loadedFileId = daoContainer.get(DAOContainer.LOADED_FILE).insert(LoadedFileDBUtils.insertDefaultParams(file.getName(), LoadedFile.TYPE_BUS_POSITIONS));
@@ -168,8 +169,10 @@ public class ImportBusPositions {
                 insertParamsPositions.add(params);
                 busPositionsHash.put(busNumber, newPosition);
             } else {
-                params.put("disposal_reason", "'" + disposalReason + "'");
-                insertParamsDispolsals.add(params);
+                if (USE_DISPOSALS) {
+                    params.put("disposal_reason", "'" + disposalReason + "'");
+                    insertParamsDispolsals.add(params);
+                }
             }
         } else {
             insertParamsPositions.add(params);
@@ -179,8 +182,10 @@ public class ImportBusPositions {
 
     private static void endLoadedFile() throws SQLException {
         daoContainer.get(DAOContainer.BUS_POSITION).insert(insertParamsPositions);
-        daoContainer.get(DAOContainer.DISPOSAL).insert(insertParamsDispolsals);
         insertParamsPositions.clear();
-        insertParamsDispolsals.clear();
+        if (USE_DISPOSALS) {
+            daoContainer.get(DAOContainer.DISPOSAL).insert(insertParamsDispolsals);
+            insertParamsDispolsals.clear();
+        }
     }
 }
