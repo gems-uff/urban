@@ -58,7 +58,7 @@ public class BusPositionContainer {
                 return busPositions.get(busNumber).get(0);
             }
         } catch (java.lang.IndexOutOfBoundsException e) {
-            System.out.println("oiee");
+            e.printStackTrace();
         }
         return null;
     }

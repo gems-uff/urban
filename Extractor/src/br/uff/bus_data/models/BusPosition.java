@@ -24,9 +24,10 @@ import org.postgis.Point;
  * @author schettino
  */
 public class BusPosition implements Comparable<BusPosition>, Mappable<String, String> {
+
     private static final float MAX_SPEED = (float) 85.57;
     private static final float MAX_DISTANCE = (float) 1.43;
-    
+
     Long id;
     Long loadedFileId;
     Long lineId;
@@ -149,6 +150,24 @@ public class BusPosition implements Comparable<BusPosition>, Mappable<String, St
         p.setSrid(4326);
         dado.position = new PGgeometry(p);
         return dado;
+    }
+
+    public void clear() {
+        this.id = null;
+        this.loadedFileId = null;
+        this.lineId = null;
+        this.busId = null;
+        this.time = null;
+        this.latitude = null;
+        this.longitude = null;
+        this.position = null;
+        this.speed = null;
+    }
+
+    public boolean empty() {
+        return ((id == null) && (loadedFileId == null) && (lineId == null)
+                && (busId == null) && (time == null) && (latitude == null)
+                && (longitude == null) && (position == null) && (speed == null));
     }
 
     @Override

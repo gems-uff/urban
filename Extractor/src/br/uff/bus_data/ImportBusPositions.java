@@ -16,10 +16,13 @@ import br.uff.bus_data.helper.Constants;
 import br.uff.bus_data.helper.DeleteDirectory;
 import br.uff.bus_data.helper.FileFinder;
 import br.uff.bus_data.helper.HashUtils;
+import br.uff.bus_data.helper.JacksonJsonParser;
 import br.uff.bus_data.helper.UnZip;
 import br.uff.bus_data.models.BusPosition;
 import br.uff.bus_data.models.LineBoundingBox;
 import br.uff.bus_data.models.LoadedFile;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -53,6 +56,7 @@ public class ImportBusPositions {
     private static List<Map<String, String>> insertParamsDispolsals;
     private static DAOContainer daoContainer;
     private static LineBoundingBoxDAO lineBoundingBoxDao;
+    private static JacksonJsonParser jacksonJsonParser;
 
     public static void main(String[] args) throws FileNotFoundException {
         try {
@@ -71,7 +75,7 @@ public class ImportBusPositions {
                 System.out.println("Jsons: " + files.length);
                 for (File file : files) {
                     if (file.isFile()) {
-                        importFile(file);
+                        importJacksonFile(file);
                     }
                 }
 
@@ -107,6 +111,23 @@ public class ImportBusPositions {
         lineBoundingBoxDao.setStatement(stmt);
         lineBoundingBoxHash = lineBoundingBoxDao.all();
         IndexesDBUtils.dropIndexes(stmt, con, USE_DISPOSALS);
+        jacksonJsonParser = new JacksonJsonParser(daoContainer);
+    }
+
+    private static void importJacksonFile(File file) throws SQLException {
+        try {
+            loadedFileId = daoContainer.get(DAOContainer.LOADED_FILE).insert(LoadedFileDBUtils.insertDefaultParams(file.getName(), LoadedFile.TYPE_BUS_POSITIONS));
+            jacksonJsonParser.parseJsonFile(file, linesHash, busesHash, loadedFileId);
+            endLoadedFile();
+            LoadedFileDBUtils.finishSuccessfully(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId);
+            con.commit();
+            System.out.println("file " + file.getName());
+        } catch (IOException ex) {
+            endLoadedFile();
+            LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, ex.getMessage());
+            con.commit();
+            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private static void importFile(File file) throws SQLException {
@@ -148,6 +169,27 @@ public class ImportBusPositions {
             }
         }
         return true;
+    }
+
+    public static void importData(BusPosition newBusPosition, String busNumber) throws SQLException {
+        BusPosition currentPosition = busPositionsHash.getLast(busNumber);
+        HashMap<String, String> params = BusPositionDBUtils.generateParams(newBusPosition);
+
+        if ((currentPosition != null)) {
+            String disposalReason = currentPosition.motivoDescarte(newBusPosition, lineBoundingBoxHash);
+            if (disposalReason == null) {
+                insertParamsPositions.add(params);
+                busPositionsHash.put(busNumber, newBusPosition);
+            } else {
+                if (USE_DISPOSALS) {
+                    params.put("disposal_reason", "'" + disposalReason + "'");
+                    insertParamsDispolsals.add(params);
+                }
+            }
+        } else {
+            insertParamsPositions.add(params);
+            busPositionsHash.put(busNumber, newBusPosition);
+        }
     }
 
     private static void importData(ArrayList<Object> data) throws SQLException {
