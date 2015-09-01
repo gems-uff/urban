@@ -20,10 +20,10 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE bus_positions (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     "time" timestamp without time zone NOT NULL,
-    bus_id integer,
-    line_id integer,
+    bus_id smallint,
+    line_id smallint,
     loaded_file_id integer,
     "position" geography(Point,4326),
     speed double precision NOT NULL,
@@ -56,8 +56,8 @@ ALTER SEQUENCE bus_positions_id_seq OWNED BY bus_positions.id;
 --
 
 CREATE TABLE buses (
-    id integer NOT NULL,
-    bus_number character varying(255),
+    id smallint NOT NULL,
+    bus_number character varying(10),
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -89,8 +89,8 @@ ALTER SEQUENCE buses_id_seq OWNED BY buses.id;
 CREATE TABLE disposals (
     id integer NOT NULL,
     "time" timestamp without time zone NOT NULL,
-    bus_id integer,
-    line_id integer,
+    bus_id smallint,
+    line_id smallint,
     loaded_file_id integer,
     "position" geography(Point,4326),
     last_postion_id integer,
@@ -126,8 +126,8 @@ ALTER SEQUENCE disposals_id_seq OWNED BY disposals.id;
 
 CREATE TABLE line_positions (
     id integer NOT NULL,
-    sequence_number integer,
-    line_id integer,
+    sequence_number smallint,
+    line_id smallint,
     description character varying(255),
     company character varying(255),
     loaded_file_id integer,
@@ -163,8 +163,8 @@ ALTER SEQUENCE line_positions_id_seq OWNED BY line_positions.id;
 
 CREATE TABLE line_stops (
     id integer NOT NULL,
-    sequence_number integer,
-    line_id integer,
+    sequence_number smallint,
+    line_id smallint,
     loaded_file_id integer,
     description character varying(255),
     company character varying(255),
@@ -198,8 +198,8 @@ ALTER SEQUENCE line_stops_id_seq OWNED BY line_stops.id;
 --
 
 CREATE TABLE lines (
-    id integer NOT NULL,
-    line_number character varying(255),
+    id smallint NOT NULL,
+    line_number character varying(10),
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -232,10 +232,10 @@ CREATE TABLE loaded_files (
     id integer NOT NULL,
     start_time timestamp without time zone NOT NULL,
     end_time timestamp without time zone,
-    status integer,
+    status smallint,
     errors character varying(255),
-    type integer,
-    filename character varying(255),
+    type smallint,
+    filename character varying(50),
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
