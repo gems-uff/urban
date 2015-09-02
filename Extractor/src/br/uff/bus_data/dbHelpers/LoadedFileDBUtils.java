@@ -50,7 +50,7 @@ public class LoadedFileDBUtils {
         Date d = new Date();
         params.put("end_time", "'" + dt.format(d) + "'");
         params.put("status", String.valueOf(Constants.STATUS_FINISHED_WITH_ERRORS));
-        params.put("errors", errors);
+        params.put("errors", "'" + errors.replaceAll("'", "''") + "'");
         ufDao.update(params, uploadedFileId);
     }
 

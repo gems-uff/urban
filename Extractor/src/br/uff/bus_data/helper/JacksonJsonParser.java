@@ -123,7 +123,7 @@ public class JacksonJsonParser {
             try {
                 date = dt.parse(value);
             } catch (Exception ex) {
-                Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println(ex.getMessage());
             }
         }
         busPosition.setTime(date);
