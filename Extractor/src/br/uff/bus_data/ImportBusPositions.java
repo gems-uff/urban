@@ -21,8 +21,6 @@ import br.uff.bus_data.helper.UnZip;
 import br.uff.bus_data.models.BusPosition;
 import br.uff.bus_data.models.LineBoundingBox;
 import br.uff.bus_data.models.LoadedFile;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -63,26 +61,35 @@ public class ImportBusPositions {
             initialize();
 
             File currentDirFile = new File("");
-            String zipsPath = currentDirFile.getAbsolutePath() + "/zips";
+            String zipsPath = currentDirFile.getAbsolutePath() + File.separator + "zips";
             File[] zips = FileFinder.finder(zipsPath, ".zip");
-            Arrays.sort(zips);
+            if (zips != null) {
+                Arrays.sort(zips);
 
-            for (File zip : zips) {
-                String zipName = zip.getName().replaceFirst("[.][^.]+$", "");
-                UnZip.unZip(zip.getAbsolutePath(), zipsPath + File.separator + zipName);
-                File[] files = FileFinder.finder(zipsPath + File.separator + zipName + "/tmp", ".json");
-                Arrays.sort(files);
-                System.out.println("Jsons: " + files.length);
-                for (File file : files) {
-                    if (file.isFile()) {
-                        importJacksonFile(file);
+                for (File zip : zips) {
+                    String zipName = zip.getName().replaceFirst("[.][^.]+$", "");
+                    UnZip.unZip(zip.getAbsolutePath(), zipsPath + File.separator + zipName);
+
+                    File[] files = FileFinder.finder(zipsPath + File.separator + zipName + File.separator + "tmp", ".json");
+                    if (files == null) {
+                        files = FileFinder.finder(zipsPath + File.separator + zipName, ".json");
                     }
-                }
 
-                try {
-                    DeleteDirectory.delete(zipsPath + File.separator + zipName);
-                } catch (IOException ex) {
-                    Logger.getLogger(UnZip.class.getName()).log(Level.SEVERE, null, ex);
+                    if (files != null) {
+                        Arrays.sort(files);
+                        System.out.println("Jsons: " + files.length);
+                        for (File file : files) {
+                            if (file.isFile()) {
+                                importJacksonFile(file);
+                            }
+                        }
+                    }
+
+                    try {
+                        DeleteDirectory.delete(zipsPath + File.separator + zipName);
+                    } catch (IOException ex) {
+                        Logger.getLogger(UnZip.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
             IndexesDBUtils.createIndexes(stmt, con, USE_DISPOSALS);
@@ -158,7 +165,7 @@ public class ImportBusPositions {
             LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, ex.getMessage());
             con.commit();
             Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }       
     }
 
     private static boolean checkFileStructure(ArrayList<String> columns) throws SQLException {
