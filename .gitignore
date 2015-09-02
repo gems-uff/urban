@@ -5,8 +5,8 @@ __pycache__
 /Extractor/dist/
 /Extractor/jsons/
 /Extractor/zips/
-/Extractor/stops/
-/Extractor/line positions/
+#/Extractor/stops/
+#/Extractor/line positions/
 /Extractor/build/
 /API/tmp/cache/
 /Extractor/nbproject/private/
