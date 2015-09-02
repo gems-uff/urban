@@ -21,7 +21,7 @@ public class IndexesDBUtils {
 
     private static Statement stamt;
 
-    public static void dropIndexes(Statement stmt, Connection con) throws SQLException {
+    public static void dropIndexes(Statement stmt, Connection con, boolean useDisposals) throws SQLException {
         stamt = stmt;
         System.out.println("Removing indexes");
         dropIndex("index_loaded_files_on_start_time_and_filename");
@@ -31,11 +31,6 @@ public class IndexesDBUtils {
         dropIndex("index_bus_positions_on_bus_id");
         dropIndex("index_bus_positions_on_line_id");
         dropIndex("index_bus_positions_on_position");
-
-        dropIndex("index_disposals_on_time");
-        dropIndex("index_disposals_on_bus_id");
-        dropIndex("index_disposals_on_line_id");
-        dropIndex("index_disposals_on_position");
 
         dropIndex("index_lines_on_line_number");
 
@@ -47,7 +42,15 @@ public class IndexesDBUtils {
         dropFK("buses", "buses_pkey");
         dropFK("loaded_files", "loaded_files_pkey");
         dropFK("bus_positions", "bus_positions_pkey");
-        dropFK("disposals", "disposals_pkey");
+
+        if (useDisposals) {
+            dropIndex("index_disposals_on_time");
+            dropIndex("index_disposals_on_bus_id");
+            dropIndex("index_disposals_on_line_id");
+            dropIndex("index_disposals_on_position");
+            dropIndex("index_disposals_on_disposal_reason");
+            dropFK("disposals", "disposals_pkey");
+        }
 
         con.commit();
 
@@ -73,7 +76,7 @@ public class IndexesDBUtils {
         System.out.println("Starting");
     }
 
-    public static void createIndexes(Statement stmt, Connection con) throws SQLException {
+    public static void createIndexes(Statement stmt, Connection con, boolean useDisposals) throws SQLException {
         stamt = stmt;
         System.out.println("Re-creating indexes");
 
@@ -83,19 +86,12 @@ public class IndexesDBUtils {
 
         createUniqueIndex("index_loaded_files_on_start_time_and_filename", "loaded_files", new String[]{"start_time", "filename"});
 
-        createUniqueIndex("index_bus_positions_on_time_and_bus_id", "bus_positions", new String[]{"time", "bus_id"});
+        createSimpleIndex("index_bus_positions_on_time_and_bus_id", "bus_positions", new String[]{"time", "bus_id"});
         createSimpleIndex("index_bus_positions_on_time", "bus_positions", new String[]{"time"});
         createSimpleIndex("index_bus_positions_on_bus_id", "bus_positions", new String[]{"bus_id"});
         createSimpleIndex("index_bus_positions_on_line_id", "bus_positions", new String[]{"line_id"});
         con.commit();
         createSpartialIndex("index_bus_positions_on_position", "bus_positions", new String[]{"position"});
-        con.commit();
-
-        createSimpleIndex("index_disposals_on_time", "disposals", new String[]{"time"});
-        createSimpleIndex("index_disposals_on_bus_id", "disposals", new String[]{"bus_id"});
-        createSimpleIndex("index_disposals_on_line_id", "disposals", new String[]{"line_id"});
-        con.commit();
-        createSpartialIndex("index_disposals_on_position", "disposals", new String[]{"position"});
         con.commit();
 
         System.out.println("Re-creating FKs");
@@ -111,10 +107,20 @@ public class IndexesDBUtils {
         createUniqueIndex("bus_positions_pkey", "bus_positions", new String[]{"id"});
         createFK("bus_positions", "bus_positions_pkey", "bus_positions_pkey");
 
-        createUniqueIndex("disposals_pkey", "disposals", new String[]{"id"});
-        createFK("disposals", "disposals_pkey", "disposals_pkey");
-
         con.commit();
+
+        if (useDisposals) {
+            createSimpleIndex("index_disposals_on_time", "disposals", new String[]{"time"});
+            createSimpleIndex("index_disposals_on_bus_id", "disposals", new String[]{"bus_id"});
+            createSimpleIndex("index_disposals_on_line_id", "disposals", new String[]{"line_id"});
+            createSimpleIndex("index_disposals_on_disposal_reason", "disposals", new String[]{"disposal_reason"});
+            con.commit();
+            createSpartialIndex("index_disposals_on_position", "disposals", new String[]{"position"});
+            con.commit();
+            createUniqueIndex("disposals_pkey", "disposals", new String[]{"id"});
+            createFK("disposals", "disposals_pkey", "disposals_pkey");
+            con.commit();
+        }
 //        System.out.println("Re-Creating FKs");
 //        stmt.execute("ALTER TABLE bus_positions ADD FOREIGN KEY (loaded_file_id) REFERENCES loaded_files(id)");
 //        System.out.println("FK bus_positions loaded_file_id OK");
@@ -154,12 +160,12 @@ public class IndexesDBUtils {
 
     private static void createIndex(String indexName, String tableName, String[] columns, int type) throws SQLException {
         String query = "CREATE ";
-        
+
         if (type == UNIQUE) {
             query += "UNIQUE ";
         }
         query += "INDEX " + indexName + " ON " + tableName;
-        if (type == SPARTIAL){
+        if (type == SPARTIAL) {
             query += " USING GIST ";
         }
         query += "(";
@@ -168,6 +174,7 @@ public class IndexesDBUtils {
         }
         query = query.substring(0, query.length() - 1);
         query += ")";
+        System.out.println("Query index " + query);
         stamt.execute(query);
         System.out.println(indexName + " OK");
     }

@@ -1,0 +1,166 @@
+<div class="col-md-12 row" style="margin-bottom: 30px; margin-top: 40px">
+
+  <form role="form" class="form-horizontal" id="form">
+
+    <div class="col-md-3">
+      <div class="form-group">
+        <label for="line" class="col-sm-5 control-label">Line number</label>
+
+        <div class="col-sm-7">
+          <input type="text" class="form-control input-sm autocomplete-line" id="line" placeholder="Enter line number">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="day_of_week-select" class="control-label col-md-4">Day of week</label>
+
+        <div class="col-md-1">
+          <input type="radio" name="query-type" value="day_of_week" class="vcenter dow-radio" checked="checked">
+        </div>
+
+        <div class="col-md-7">
+          <%= select_tag :day_of_week, options_for_select(I18n.t(:'date.day_names').map.with_index { |d, index| [d, index] }),
+                         :prompt => 'Select a day of week', :class => 'form-control input-sm dow-select', :id => 'day_of_week-select' %>
+        </div>
+
+      </div>
+      <div class="form-group">
+        <label for="date" class="control-label col-md-4">Date</label>
+
+        <div class="col-md-1">
+          <input type="radio" name="query-type" class="vcenter date-radio" value="date">
+        </div>
+
+        <div class="col-md-7">
+          <input type="text" class="datepicker form-control input-sm" id="date-selection" placeholder="Choose a date">
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-md-5">
+      <div class="form-group">
+        <label for="slider" class="control-label col-md-3">Time range</label>
+
+        <div class="col-md-9">
+          <div id="slider" class="form-control time-slider"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="clearfix"></div>
+    <div class="form-actions pull-right">
+      <button type="button" id="form-clear" style="margin-right: 10px" class="btn btn-warning btn-sm">Clear</button>
+      <input type="submit" id="form-submit" class="btn btn-primary btn-sm">
+      <div class="clearfix"></div>
+    </div>
+    <input type="hidden" id="time_begin">
+    <input type="hidden" id="time_end">
+  </form>
+  <div class="btn-group" role="group" aria-label="..." id="select-chart-type">
+    <button type="button" class="btn btn-default" onClick="changeChartType('pie')">Pie</button>
+    <button type="button" class="btn btn-default" onClick="changeChartType('column')">Column</button>
+  </div>
+</div>
+
+<script>
+    $(function () {
+        $slider = $("#slider").slider({
+            range: true,
+            min: 0,
+            max: 24,
+            values: [ 0, 24 ],
+            slide: function( event, ui ) {
+                $("#time_begin").val(ui.values[ 0 ])
+                $("#time_end").val(ui.values[ 1 ])
+            }
+        });
+
+        $slider.slider("pips").slider("float", {});
+    });
+
+    $("#time_begin").val(0);
+    $("#time_end").val(24);
+
+    $("input[name=query-type]").change(function () {
+        if ($(this).val() == 'day_of_week') {
+            $('.datepicker').prop('disabled', true);
+            $('.dow-select').prop('disabled', false);
+        } else if ($(this).val() == 'date') {
+            $('.datepicker').prop('disabled', false);
+            $('.dow-select').prop('disabled', true);
+        }
+    });
+
+</script>
+
+<script>
+    $(".stops-switch").bootstrapSwitch();
+    $('.stops-switch').on('switchChange.bootstrapSwitch', function (event, state) {
+        if (state) {
+            showMarkers();
+        } else {
+            clearMarkers();
+        }
+    });
+    $('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
+    $('.datepicker').prop('disabled', true);
+
+
+    var line;
+    var baseHeatmapPoints = [];
+    var dow = undefined;
+    var date = undefined;
+    var time_begin = undefined;
+    var time_end = undefined;
+    var dow_diff = undefined;
+    var date_diff = undefined;
+    var time_begin_diff = undefined;
+    var time_end_diff = undefined;
+    var polylines = [];
+    var positions = [];
+    var stops = [];
+    var bus_positions = [];
+
+    function buildVariables() {
+
+        dow_diff = undefined;
+        date_diff = undefined;
+        time_begin_diff = undefined;
+        time_end_diff = undefined;
+        if (line == null || line == "")
+            line = $("#line").val();
+        if (!$('#day_of_week-select').prop('disabled') && $('#day_of_week-select').val() != "")
+            dow = $('#day_of_week-select').val();
+        if (!$('#date-selection').prop('disabled') && $('#date-selection').val() != "")
+            date = $('#date-selection').val();
+        time_begin = $("#time_begin").val();
+        time_end = $("#time_end").val();
+        if (time_begin == 0 && time_end == 24) {
+            time_begin = undefined;
+            time_end = undefined;
+
+        }
+    }
+
+    function prepareMap(data) {
+        positions = data.positions
+        stops = data.stops
+        bus_positions = data.data
+
+        for (i = 0; i < polylines.length; i++) {
+            polylines[i].setMap(null);
+        }
+
+        baseHeatmap.setMap(null);
+        baseHeatmapPoints = [];
+        polylines = [];
+        deleteMarkers();
+        clearPolylines();
+    }
+
+</script>

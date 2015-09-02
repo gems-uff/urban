@@ -14,6 +14,8 @@ module BusData
       config.assets.paths << path
     end
 
+    config.autoload_paths += Dir[Rails.root.join('app', 'models', '{**}')]
+
     #config.i18n.locale = "pt-BR"
     #config.i18n.default_locale = "pt-BR"
     # Settings in config/environments/* take precedence over those specified here.

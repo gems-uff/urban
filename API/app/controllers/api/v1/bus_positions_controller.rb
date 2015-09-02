@@ -20,11 +20,11 @@ class Api::V1::BusPositionsController < ApplicationController
       respond_with({:code => HttpResponse::CODE_LINE_NOT_FOUND, :message => HttpResponse.code_msg(HttpResponse::CODE_LINE_NOT_FOUND)}) and return unless line
 
       data = BusPosition.from_week(line)
-      resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :line => params[:line]}
+      resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :line => params[:line], :data => {}}
       data.each do |d|
         wday = d.time.strftime('%A')
-        resp[wday] = [] unless resp[wday]
-        resp[wday] << d.speed
+        resp[:data][wday] = [] unless resp[:data][wday]
+        resp[:data][wday] << d.speed
       end
 
       respond_with(resp)
@@ -42,7 +42,7 @@ class Api::V1::BusPositionsController < ApplicationController
 
       respond_with({:code => HttpResponse::CODE_LINE_NOT_FOUND, :message => HttpResponse.code_msg(HttpResponse::CODE_LINE_NOT_FOUND)}) and return unless line
 
-      data = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(bp.position)) as longitude, ST_Y(ST_AsEWKT(bp.position)) as latitude, bp.speed, b.bus_number FROM bus_positions bp join buses b on b.id = bp.bus_id WHERE bp.line_id = #{line.id}")
+      data = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(bp.position)) as longitude, ST_Y(ST_AsEWKT(bp.position)) as latitude, bp.speed, b.bus_number, bp.time FROM bus_positions bp join buses b on b.id = bp.bus_id WHERE bp.line_id = #{line.id}")
 
       resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :columns => data.columns, :data => data.rows}
 

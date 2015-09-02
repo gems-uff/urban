@@ -1,0 +1,122 @@
+
+
+{
+    "code":0,"message":"Success",
+    "data":
+        {
+        "line":"10",
+        "monday": {
+            "speed": [ avg_speed_at_midnight, ... ,
+                     avg_speed_at_11PM ],
+            "count": [ avg_count_at_midnight, ... ,
+                     avg_count_at_11PM ]
+            },
+        "tuesday": {
+            "speed": [ avg_speed_at_midnight, ... ,
+                     avg_speed_at_11PM ],
+            "count": [ avg_count_at_midnight, ... ,
+                     avg_count_at_11PM ]
+            },
+        ...,
+        "sunday": {
+            "speed": [ avg_speed_at_midnight, ... ,
+                     avg_speed_at_11PM ],
+            "count": [ avg_count_at_midnight, ... ,
+                     avg_count_at_11PM ]
+            }
+        }
+}
+
+
+{
+    "code":0,"message":"Success",
+    "data":
+        {
+        "columns":["longitude","latitude","speed",
+                   "bus_number", "line_number"
+                   "time"],
+        "records": [
+            ["-43.292889","-22.888842","30.19",
+             "A72045", "10",
+             "2015-06-03 00:00:27"],
+            ...,
+            ["-43.291771","-22.889553","46.37",
+             "A72062", "10",
+             "2015-06-03 00:05:22"]
+            ]
+        }
+}
+
+{
+    "code":0,"message":"Success",
+    "data":
+        {
+        "columns":["longitude","latitude","speed",
+                   "bus_number", "line_number",
+                   "time", "disposal_reason"],
+        "records": [
+            ["-43.274869","-22.889852","178.01",
+            "A72041", "10",
+            "2015-06-04 00:03:32",
+            "Speed higher than 120 km/h" ],
+            ...,
+            ["-43.292561","-22.819323","32.39",
+            "A72066", "10",
+            "2015-06-04 02:05:21",
+            "Repeated record"]
+            ]
+        }
+}
+
+
+{
+    "code":0,"message":"Success",
+    "data":
+        {
+        "columns":["line_number","latitude","longitude",
+                   "sequence_number", "description",
+                   "company"],
+        "records": [
+            ["10","-22.9015","-43.1922",
+            "1", "010-FATIMA X CENTRAL (CIRCULAR)",
+            "Fetranspor"],
+            ...,
+            ["10","-22.8969","-43.183",
+            "23", "010-FATIMA X CENTRAL (CIRCULAR)",
+            "Fetranspor"]
+            ]
+        }
+}
+
+
+{
+    "code":0,"message":"Success",
+    "data":
+        {
+        "columns":["line_number","latitude","longitude",
+                   "sequence_number", "description",
+                   "company", "shape_id"],
+        "records": [
+            ["10","-22.9025","-43.1913",
+            "1", "010-FATIMA X CENTRAL (CIRCULAR)",
+            "Fetranspor", "17619659"],
+            ...,
+            ["10","-22.901","-43.1927",
+            "208", "010-FATIMA X CENTRAL (CIRCULAR)",
+            "Fetranspor", "17762449"]
+            ]
+        }
+}
+
+
+
+{
+    "code":0,"message":"Success",
+    "data":
+        {
+            "max_lat":-22.8935,
+            "min_lat":-22.9189,
+            "max_long":-43.1711,
+            "min_long":-43.19699
+        }
+}

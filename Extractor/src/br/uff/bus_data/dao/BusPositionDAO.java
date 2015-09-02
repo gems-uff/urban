@@ -38,7 +38,7 @@ public class BusPositionDAO extends AbstractDAO<BusPosition> {
         long coletaId = rs.getLong("loaded_file_id");
         long linhaId = rs.getLong("line_id");
         long onibusId = rs.getLong("bus_id");
-        PGgeometry position =  new PGgeometry(rs.getObject("position").toString());
+        PGgeometry position = new PGgeometry(rs.getObject("position").toString());
 //        float latitude = rs.getFloat("latitude");
 //        float longitude = rs.getFloat("longitude");
         float speed = rs.getFloat("speed");
@@ -74,22 +74,40 @@ public class BusPositionDAO extends AbstractDAO<BusPosition> {
         return attrs;
     }
 
-    public HashMap<String, BusPosition> selectUltimasPosicoes() throws SQLException {
-        HashMap<String, BusPosition> map = new HashMap<String, BusPosition>();
+    public HashMap<String, List<BusPosition>> selectUltimasPosicoes() throws SQLException {
+        HashMap<String, List<BusPosition>> map = new HashMap<String, List<BusPosition>>();
+
         String query = "SELECT * FROM ";
         query += getTableName();
-        query += " d1 INNER JOIN (SELECT di.bus_id, MAX(di.id) AS lastPositionId"
-                + " FROM bus_positions di GROUP BY di.bus_id) d2"
-                + " ON (d1.id = d2.lastPositionId)"
+        query += " d1 INNER JOIN (select di.bus_id, di.time as lastpositiontime "
+                + " FROM bus_positions di GROUP BY di.bus_id, di.time order by di.time desc offset 11 limit 1) d2"
+                + " ON (d1.time >= d2. lastPositionTime)"
                 + " INNER JOIN buses o"
-                + " ON (o.id = d1.bus_id)";
+                + " ON (o.id = d1.bus_id)"
+                + "ORDER BY d1.time DESC";
 
         ResultSet rs = stmt.executeQuery(query);
+        String lastNumber = null;
+        boolean getNextBus = true;
+        List<BusPosition> busPositions = new ArrayList<BusPosition>();
         while (rs.next()) {
-            map.put(rs.getString("bus_number"), getFromResultSet(rs));
+            String busNumber = rs.getString("bus_number");
+            if (!(getNextBus && busNumber.equals(lastNumber))) {
+
+                if (!busNumber.equals(lastNumber)) {
+                    lastNumber = busNumber;
+                    getNextBus = false;
+                    map.put(busNumber, busPositions);
+                    busPositions = new ArrayList<BusPosition>();
+                }
+                if (busPositions.size() < 10) {
+                    busPositions.add(getFromResultSet(rs));
+                } else {
+                    map.put(busNumber, busPositions);
+                    getNextBus = true;
+                }
+            }
         }
         return map;
     }
 }
-
-

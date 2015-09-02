@@ -1,7 +1,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 <%- model_class = LinePosition -%>
 <div class="page-header">
-  <h1><%= t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <h1><%= t '.title', :default => "Line Routes" %></h1>
 </div>
 
 <div class="col-md-12 row" style="margin-bottom: 30px">
@@ -16,12 +16,21 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="form-group">
         <label for="show_stops" class="col-sm-4 control-label">Show stops</label>
 
         <div class="col-sm-6">
           <input id="show_stops" type="checkbox" name="show_stops" data-on-text="YES" data-off-text="NO" checked data-size="small" data-on-color="success" data-off-color="danger">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="show_box" class="col-sm-4 control-label">Show Bounding Box</label>
+
+        <div class="col-sm-6">
+          <input id="show_box" type="checkbox" name="show_box" data-on-text="YES" data-off-text="NO" checked data-size="small" data-on-color="success" data-off-color="danger">
         </div>
       </div>
     </div>
@@ -64,12 +73,20 @@
     }
     var fp = []
 
+    var boxCoords = [];
+
+    function setBoxCoords(box) {
+        boxCoords = box;
+    }
+
     var flightPath = new google.maps.Polyline({
         path: fp,
         strokeColor: "#0000FF",
         strokeOpacity: 1.0,
         strokeWeight: 2
     });
+
+    var boundingBox = new google.maps.Polygon();
 
     // Add a polyline to the map and push to the array.
     function addPolyline(lat, long) {
@@ -83,6 +100,10 @@
         flightPath.setMap(null)
     }
 
+    function clearBoundingBox(){
+        boundingBox.setMap(null)
+    }
+
     // Shows any fp currently in the array.
     function showPolylines() {
         flightPath.setPath(fp);
@@ -92,6 +113,19 @@
             bounds.extend(fp[i]);
         }
         map.fitBounds(bounds);
+    }
+
+    // Shows any fp currently in the array.
+    function showBoundingBox() {
+        boundingBox = new google.maps.Polygon({
+            paths: boxCoords,
+            strokeColor: '#589fec',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#9ac3f0',
+            fillOpacity: 0.35
+        });
+        boundingBox.setMap(map);
     }
 
     // Deletes all fp in the array by removing references to them.
@@ -125,20 +159,34 @@
                 .done(function (data) {
                     positions = data.positions
                     stops = data.stops
+                    box = data.bounding_box
                     deleteMarkers();
                     deletePolylines();
+                    clearBoundingBox();
                     for (var i = 0; i < positions.length; i++) {
                         addPolyline(positions[i]['latitude'], positions[i]['longitude']);
                     }
                     for (var i = 0; i < stops.length; i++) {
                         addMarker(new google.maps.LatLng(stops[i]['latitude'], stops[i]['longitude']));
                     }
+                    setBoxCoords([
+                        new google.maps.LatLng(box['min_lat'], box['max_long']),
+                        new google.maps.LatLng(box['max_lat'], box['max_long']),
+                        new google.maps.LatLng(box['max_lat'], box['min_long']),
+                        new google.maps.LatLng(box['min_lat'], box['min_long'])
+                    ])
+
                     showPolylines();
 
                     if ($('input[name="show_stops"]').bootstrapSwitch('state')) {
                         showMarkers();
-                    }else{
+                    } else {
                         clearMarkers();
+                    }
+                    if ($('input[name="show_box"]').bootstrapSwitch('state')) {
+                        showBoundingBox();
+                    } else {
+                        clearBoundingBox();
                     }
                     line = null;
                 });
@@ -146,7 +194,6 @@
 
 
     var markers = []
-
 
 
     // Add a marker to the map and push to the array.
@@ -195,11 +242,20 @@
     }
 
     $('input[name="show_stops"]').bootstrapSwitch();
-    $('input[name="show_stops"]').on('switchChange.bootstrapSwitch', function(event, state) {
+    $('input[name="show_stops"]').on('switchChange.bootstrapSwitch', function (event, state) {
         if (state) {
             showMarkers();
         } else {
             clearMarkers();
+        }
+    });
+
+    $('input[name="show_box"]').bootstrapSwitch();
+    $('input[name="show_box"]').on('switchChange.bootstrapSwitch', function (event, state) {
+        if (state) {
+            showBoundingBox();
+        } else {
+            clearBoundingBox();
         }
     });
 

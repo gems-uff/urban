@@ -20,10 +20,10 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE bus_positions (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     "time" timestamp without time zone NOT NULL,
-    bus_id integer,
-    line_id integer,
+    bus_id smallint,
+    line_id smallint,
     loaded_file_id integer,
     "position" geography(Point,4326),
     speed double precision NOT NULL,
@@ -56,8 +56,8 @@ ALTER SEQUENCE bus_positions_id_seq OWNED BY bus_positions.id;
 --
 
 CREATE TABLE buses (
-    id integer NOT NULL,
-    bus_number character varying(255),
+    id smallint NOT NULL,
+    bus_number character varying(10),
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -83,47 +83,14 @@ ALTER SEQUENCE buses_id_seq OWNED BY buses.id;
 
 
 --
--- Name: contatos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE contatos (
-    id integer NOT NULL,
-    name character varying(255),
-    email character varying(255),
-    telephone character varying(255),
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: contatos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE contatos_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: contatos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE contatos_id_seq OWNED BY contatos.id;
-
-
---
 -- Name: disposals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE disposals (
     id integer NOT NULL,
     "time" timestamp without time zone NOT NULL,
-    bus_id integer,
-    line_id integer,
+    bus_id smallint,
+    line_id smallint,
     loaded_file_id integer,
     "position" geography(Point,4326),
     last_postion_id integer,
@@ -159,8 +126,8 @@ ALTER SEQUENCE disposals_id_seq OWNED BY disposals.id;
 
 CREATE TABLE line_positions (
     id integer NOT NULL,
-    sequence_number integer,
-    line_id integer,
+    sequence_number smallint,
+    line_id smallint,
     description character varying(255),
     company character varying(255),
     loaded_file_id integer,
@@ -196,8 +163,8 @@ ALTER SEQUENCE line_positions_id_seq OWNED BY line_positions.id;
 
 CREATE TABLE line_stops (
     id integer NOT NULL,
-    sequence_number integer,
-    line_id integer,
+    sequence_number smallint,
+    line_id smallint,
     loaded_file_id integer,
     description character varying(255),
     company character varying(255),
@@ -231,8 +198,8 @@ ALTER SEQUENCE line_stops_id_seq OWNED BY line_stops.id;
 --
 
 CREATE TABLE lines (
-    id integer NOT NULL,
-    line_number character varying(255),
+    id smallint NOT NULL,
+    line_number character varying(10),
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -265,10 +232,10 @@ CREATE TABLE loaded_files (
     id integer NOT NULL,
     start_time timestamp without time zone NOT NULL,
     end_time timestamp without time zone,
-    status integer,
+    status smallint,
     errors character varying(255),
-    type integer,
-    filename character varying(255),
+    type smallint,
+    filename character varying(50),
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -320,13 +287,6 @@ ALTER TABLE ONLY buses ALTER COLUMN id SET DEFAULT nextval('buses_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY contatos ALTER COLUMN id SET DEFAULT nextval('contatos_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY disposals ALTER COLUMN id SET DEFAULT nextval('disposals_id_seq'::regclass);
 
 
@@ -372,14 +332,6 @@ ALTER TABLE ONLY bus_positions
 
 ALTER TABLE ONLY buses
     ADD CONSTRAINT buses_pkey PRIMARY KEY (id);
-
-
---
--- Name: contatos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY contatos
-    ADD CONSTRAINT contatos_pkey PRIMARY KEY (id);
 
 
 --
@@ -472,6 +424,13 @@ CREATE INDEX index_disposals_on_bus_id ON disposals USING btree (bus_id);
 
 
 --
+-- Name: index_disposals_on_disposal_reason; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_disposals_on_disposal_reason ON disposals USING btree (disposal_reason);
+
+
+--
 -- Name: index_disposals_on_line_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -503,7 +462,7 @@ CREATE INDEX index_line_positions_on_line_id ON line_positions USING btree (line
 -- Name: index_line_positions_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_line_positions_on_position ON line_positions USING btree ("position");
+CREATE INDEX index_line_positions_on_position ON line_positions USING gist ("position");
 
 
 --
@@ -517,7 +476,7 @@ CREATE INDEX index_line_stops_on_line_id ON line_stops USING btree (line_id);
 -- Name: index_line_stops_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_line_stops_on_position ON line_stops USING btree ("position");
+CREATE INDEX index_line_stops_on_position ON line_stops USING gist ("position");
 
 
 --
@@ -560,6 +519,4 @@ INSERT INTO schema_migrations (version) VALUES ('20140414031450');
 INSERT INTO schema_migrations (version) VALUES ('20140922035218');
 
 INSERT INTO schema_migrations (version) VALUES ('20140922035534');
-
-INSERT INTO schema_migrations (version) VALUES ('20141215180720');
 
