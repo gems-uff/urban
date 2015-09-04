@@ -5,7 +5,7 @@
  */
 package br.uff.bus_data.models;
 
-import br.uff.bus_data.ImportBusPositions;
+import br.uff.ic.Provenance.ImportBusPositions;
 import br.uff.bus_data.helper.Constants;
 import br.uff.bus_data.helper.DateHelper;
 import br.uff.bus_data.helper.LatLongConvertion;

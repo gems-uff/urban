@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -130,6 +131,24 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         stmt.executeUpdate(query);
     }
 
+    //__________________________________________________________________________
+    //NOVO SELECT
+    
+    public List<T> newSelect(String params) throws SQLException {
+        list = new ArrayList<T>();
+        String query = "SELECT * FROM bus_positions WHERE ";
+        query += params;     
+//JOptionPane.showMessageDialog(null, query);
+        ResultSet rs = stmt.executeQuery(query);
+        //JOptionPane.showMessageDialog(null, query);
+        while (rs.next()) {
+            list.add(getFromResultSet(rs));
+        }
+        return list;
+    }
+    
+    //__________________________________________________________________________
+    
     public List<T> select(HashMap<String, String> params) throws SQLException {
         list = new ArrayList<T>();
         String query = "SELECT * FROM ";
@@ -148,6 +167,7 @@ public abstract class AbstractDAO<T extends Mappable<String, String>> {
         }
 
         ResultSet rs = stmt.executeQuery(query);
+        //JOptionPane.showMessageDialog(null, query);
         while (rs.next()) {
             list.add(getFromResultSet(rs));
         }

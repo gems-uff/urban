@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,8 +20,10 @@ public class MySQLDBConnection implements DBConnectionInterface {
 
     private static final String JDBC = "mysql";
     private static final String DATABASE = "//localhost/bus_data_development6";
-    private static final String USER = "root";
-    private static final String PASSWORD = "tzzk7662";
+    private static final String USER = "gems";
+    private static final String PASSWORD = "gemsuff";
+    //private static final String USER = "thiago";
+    //private static final String PASSWORD = "2015pg";
     private static final String ADAPTER_CLASS_NAME = "com.mysql.jdbc.Driver";
 
     @Override
@@ -54,6 +57,7 @@ public class MySQLDBConnection implements DBConnectionInterface {
             Class.forName(this.getAdapterClassName());
             String connectionUrl = "jdbc:" + this.getJDBC() + ":" + this.getDatabase() + "?"
                     + "user=" + this.getUser() + "&password=" + this.getPassword();
+            //JOptionPane.showMessageDialog(null, "connectionUrl: " + connectionUrl);
             Connection con = DriverManager.getConnection(connectionUrl);
             return con;
         } catch (ClassNotFoundException ex) {

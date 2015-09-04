@@ -19,8 +19,8 @@ public class PostgresDBConnection implements DBConnectionInterface {
 
     private static final String JDBC = "postgresql";
     private static final String DATABASE = "//localhost:5432/bus_data2_development";
-    private static final String USER = "schettino";
-    private static final String PASSWORD = "";
+    private static final String USER = "gems";
+    private static final String PASSWORD = "gemsuff";
     private static final String ADAPTER_CLASS_NAME = "com.mysql.jdbc.Driver";
 
     @Override
