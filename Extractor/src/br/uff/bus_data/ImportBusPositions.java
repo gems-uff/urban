@@ -70,7 +70,7 @@ public class ImportBusPositions {
                     String zipName = zip.getName().replaceFirst("[.][^.]+$", "");
                     UnZip.unZip(zip.getAbsolutePath(), zipsPath + File.separator + zipName);
 
-                    File[] files = FileFinder.finder(zipsPath + File.separator 
+                    File[] files = FileFinder.finder(zipsPath + File.separator
                             + zipName + File.separator + "tmp", ".json");
                     if (files == null) {
                         files = FileFinder.finder(zipsPath + File.separator + zipName, ".json");
@@ -130,11 +130,17 @@ public class ImportBusPositions {
             LoadedFileDBUtils.finishSuccessfully(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId);
             con.commit();
             System.out.println("file " + file.getName());
+        } catch (SQLException sqlEx) {
+            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, sqlEx);
+            clearParams();
+            con.rollback();
+            LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, sqlEx.getMessage());
+            con.commit();
         } catch (Exception ex) {
+            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
             endLoadedFile();
             LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, ex.getMessage());
             con.commit();
-            Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -166,7 +172,7 @@ public class ImportBusPositions {
             LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, ex.getMessage());
             con.commit();
             Logger.getLogger(ImportBusPositions.class.getName()).log(Level.SEVERE, null, ex);
-        }       
+        }
     }
 
     private static boolean checkFileStructure(ArrayList<String> columns) throws SQLException {
@@ -232,6 +238,10 @@ public class ImportBusPositions {
 
     private static void endLoadedFile() throws SQLException {
         daoContainer.get(DAOContainer.BUS_POSITION).insert(insertParamsPositions);
+        clearParams();
+    }
+
+    private static void clearParams() throws SQLException {
         insertParamsPositions.clear();
         if (USE_DISPOSALS) {
             daoContainer.get(DAOContainer.DISPOSAL).insert(insertParamsDispolsals);
