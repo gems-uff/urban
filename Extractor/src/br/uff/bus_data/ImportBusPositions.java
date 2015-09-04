@@ -70,7 +70,8 @@ public class ImportBusPositions {
                     String zipName = zip.getName().replaceFirst("[.][^.]+$", "");
                     UnZip.unZip(zip.getAbsolutePath(), zipsPath + File.separator + zipName);
 
-                    File[] files = FileFinder.finder(zipsPath + File.separator + zipName + File.separator + "tmp", ".json");
+                    File[] files = FileFinder.finder(zipsPath + File.separator 
+                            + zipName + File.separator + "tmp", ".json");
                     if (files == null) {
                         files = FileFinder.finder(zipsPath + File.separator + zipName, ".json");
                     }
@@ -129,7 +130,7 @@ public class ImportBusPositions {
             LoadedFileDBUtils.finishSuccessfully(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId);
             con.commit();
             System.out.println("file " + file.getName());
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             endLoadedFile();
             LoadedFileDBUtils.finishWithErrors(daoContainer.get(DAOContainer.LOADED_FILE), loadedFileId, ex.getMessage());
             con.commit();
