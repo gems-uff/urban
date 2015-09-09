@@ -81,7 +81,7 @@ public class BusPosition implements Comparable<BusPosition>, Mappable<String, St
     }
 
     public String motivoDescarte(BusPosition novo, Map<Long, LineBoundingBox> lineBoundingBoxHash) {
-        if ((novo.time == null) || (novo.speed == null)) {
+        if ((novo.time == null) || (novo.speed == null) || (novo.latitude == null) || (novo.longitude == null)) {
             return "Invalid data";
         }
 

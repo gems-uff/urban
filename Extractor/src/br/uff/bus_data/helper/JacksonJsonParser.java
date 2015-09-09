@@ -163,7 +163,9 @@ public class JacksonJsonParser {
     }
 
     protected void afterEndElement(Long loadedFileId) throws SQLException {
-        setPosition();
+        if ((busPosition.getLatitude() != null) && (busPosition.getLongitude() != null)) {
+            setPosition();
+        }
         busPosition.setLoadedFileId(loadedFileId);
         ImportBusPositions.importData(busPosition, busNumber);
     }
