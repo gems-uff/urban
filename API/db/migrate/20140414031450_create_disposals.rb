@@ -8,12 +8,12 @@ class CreateDisposals < ActiveRecord::Migration
        t.point :position, :geographic => true
        t.integer :last_postion_id, :references => BusPosition
        t.float :speed, :null => false
-       t.string :disposal_reason, :null => false
+       t.integer :disposal_reason_id, :null => false, :limit => 2
        t.timestamps
      end
      ActiveRecord::Base.connection.execute('CREATE INDEX index_disposals_on_position ON disposals USING GIST (position)')
      add_index :disposals, :line_id
-     add_index :disposals, :disposal_reason
+     add_index :disposals, :disposal_reason_id
      add_index :disposals, :bus_id
      add_index :disposals, :time
   end

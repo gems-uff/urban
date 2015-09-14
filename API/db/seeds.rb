@@ -5,6 +5,8 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+puts 'importando disposal_reasons'
+ActiveRecord::Base.connection.execute File.read(File.expand_path('../seeds/disposal_reasons.sql', __FILE__))
 puts 'importando lines'
 ActiveRecord::Base.connection.execute File.read(File.expand_path('../seeds/lines.sql', __FILE__))
 puts 'importando loaded files'

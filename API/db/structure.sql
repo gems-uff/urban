@@ -83,6 +83,37 @@ ALTER SEQUENCE buses_id_seq OWNED BY buses.id;
 
 
 --
+-- Name: disposal_reasons; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE disposal_reasons (
+    id smallint NOT NULL,
+    name character varying(50),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: disposal_reasons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE disposal_reasons_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: disposal_reasons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE disposal_reasons_id_seq OWNED BY disposal_reasons.id;
+
+
+--
 -- Name: disposals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -95,7 +126,7 @@ CREATE TABLE disposals (
     "position" geography(Point,4326),
     last_postion_id integer,
     speed double precision NOT NULL,
-    disposal_reason character varying(255) NOT NULL,
+    disposal_reason_id smallint NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -287,6 +318,13 @@ ALTER TABLE ONLY buses ALTER COLUMN id SET DEFAULT nextval('buses_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY disposal_reasons ALTER COLUMN id SET DEFAULT nextval('disposal_reasons_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY disposals ALTER COLUMN id SET DEFAULT nextval('disposals_id_seq'::regclass);
 
 
@@ -332,6 +370,14 @@ ALTER TABLE ONLY bus_positions
 
 ALTER TABLE ONLY buses
     ADD CONSTRAINT buses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: disposal_reasons_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY disposal_reasons
+    ADD CONSTRAINT disposal_reasons_pkey PRIMARY KEY (id);
 
 
 --
@@ -424,10 +470,10 @@ CREATE INDEX index_disposals_on_bus_id ON disposals USING btree (bus_id);
 
 
 --
--- Name: index_disposals_on_disposal_reason; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_disposals_on_disposal_reason_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_disposals_on_disposal_reason ON disposals USING btree (disposal_reason);
+CREATE INDEX index_disposals_on_disposal_reason_id ON disposals USING btree (disposal_reason_id);
 
 
 --
@@ -511,6 +557,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140414031430');
 INSERT INTO schema_migrations (version) VALUES ('20140414031440');
 
 INSERT INTO schema_migrations (version) VALUES ('20140414031445');
+
+INSERT INTO schema_migrations (version) VALUES ('20140414031448');
 
 INSERT INTO schema_migrations (version) VALUES ('20140414031449');
 
