@@ -48,7 +48,7 @@ public class IndexesDBUtils {
             dropIndex("index_disposals_on_bus_id");
             dropIndex("index_disposals_on_line_id");
             dropIndex("index_disposals_on_position");
-            dropIndex("index_disposals_on_disposal_reason");
+            dropIndex("index_disposals_on_disposal_reason_id");
             dropFK("disposals", "disposals_pkey");
         }
 
@@ -113,7 +113,7 @@ public class IndexesDBUtils {
             createSimpleIndex("index_disposals_on_time", "disposals", new String[]{"time"});
             createSimpleIndex("index_disposals_on_bus_id", "disposals", new String[]{"bus_id"});
             createSimpleIndex("index_disposals_on_line_id", "disposals", new String[]{"line_id"});
-            createSimpleIndex("index_disposals_on_disposal_reason", "disposals", new String[]{"disposal_reason"});
+            createSimpleIndex("index_disposals_on_disposal_reason_id", "disposals", new String[]{"disposal_reason_id"});
             con.commit();
             createSpartialIndex("index_disposals_on_position", "disposals", new String[]{"position"});
             con.commit();

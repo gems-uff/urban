@@ -29,7 +29,7 @@ public class Disposal implements Mappable<String, String> {
     Double longitude;
     PGgeometry position;
     Float speed;
-    String disposalReason;
+    Long disposalReasonId;
 
     public Long getId() {
         return id;
@@ -116,12 +116,12 @@ public class Disposal implements Mappable<String, String> {
         this.speed = speed;
     }
 
-    public String getDisposalReason() {
-        return disposalReason;
+    public Long getDisposalReasonId() {
+        return disposalReasonId;
     }
 
-    public void setDisposalReason(String disposalReason) {
-        this.disposalReason = disposalReason;
+    public void setDisposalReasonId(Long disposalReason) {
+        this.disposalReasonId = disposalReason;
     }
 
     @Override
@@ -138,7 +138,7 @@ public class Disposal implements Mappable<String, String> {
         map.put("position", "'" + String.valueOf(p.toString()) + "'");
         map.put("speed", String.valueOf(this.speed));
         map.put("time", "'" + dt.format(this.time) + "'");
-        map.put("disposal_reason", "'" + this.disposalReason + "'");
+        map.put("disposal_reason_id",String.valueOf(this.disposalReasonId));
         return map;
     }
 
@@ -148,6 +148,6 @@ public class Disposal implements Mappable<String, String> {
                 + "; Speed: " + this.speed + "; Time: "
                 + this.time + "; Bus: " + this.busId + "; Line: "
                 + this.lineId + "; Loaded File: " + this.loadedFileId + "; Last Position: "
-                + this.lastPositionId + "; Disposal Reason: " + this.disposalReason;
+                + this.lastPositionId + "; Disposal Reason: " + this.disposalReasonId;
     }
 }

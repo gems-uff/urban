@@ -39,7 +39,7 @@ public class DisposalDAO extends AbstractDAO<Disposal> {
         long lastPositionId = rs.getLong("last_postion_id");
         PGgeometry position =  new PGgeometry(rs.getObject("position").toString());
         float speed = rs.getFloat("speed");
-        String disposal_reason = rs.getString("disposal_reason");
+        Long disposal_reason = rs.getLong("disposal_reason_id");
 
         disposal.setTime(time);
         disposal.setId(i);
@@ -49,7 +49,7 @@ public class DisposalDAO extends AbstractDAO<Disposal> {
         disposal.setPosition(position);
         disposal.setSpeed(speed);
         disposal.setLastPositionId(lastPositionId);
-        disposal.setDisposalReason(disposal_reason);
+        disposal.setDisposalReasonId(disposal_reason);
 
         return disposal;
     }
@@ -71,7 +71,7 @@ public class DisposalDAO extends AbstractDAO<Disposal> {
 //        attrs.add("latitude");
 //        attrs.add("longitude");
         attrs.add("speed");
-        attrs.add("disposal_reason");
+        attrs.add("disposal_reason_id");
         return attrs;
     }
 
