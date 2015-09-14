@@ -17,6 +17,8 @@ import java.util.Map;
  */
 public class BusPositionContainer {
 
+    private static final int MAX_SIZE = 10;
+
     private Map<String, List<BusPosition>> busPositions;
 
     public BusPositionContainer() {
@@ -41,7 +43,7 @@ public class BusPositionContainer {
                 }
             }
             list.add(i, busPosition);
-            if (list.size() > 10) {
+            if (list.size() > MAX_SIZE) {
                 list.remove(list.size() - 1);
             }
         } else {
@@ -61,6 +63,34 @@ public class BusPositionContainer {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public BusPosition getPrecursor(String busNumber, BusPosition busPosition) {
+        if (busPositions.containsKey(busNumber)) {
+            List<BusPosition> list = busPositions.get(busNumber);
+            for (BusPosition bp : list) {
+                if (busPosition.getTime().after(bp.getTime())) {
+                    return bp;
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean isIn(String busNumber, BusPosition busPosition) {
+        if (busPositions.containsKey(busNumber)) {
+            List<BusPosition> list = busPositions.get(busNumber);
+            if ((list.size() == MAX_SIZE)
+                    && (busPosition.getTime().before(list.get(MAX_SIZE - 1).getTime()))) {
+                return true;
+            }
+            for (BusPosition bp : list) {
+                if (busPosition.getTime().equals(bp.getTime())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
