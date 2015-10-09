@@ -51,6 +51,10 @@ public class DiscardRecordHelper {
 
     public Long disposalReason(BusPosition newBusPosition, BusPosition lastBusPosition, String busNumber) {
 
+        if (discardInvalidData(newBusPosition)) {
+            return INVALID_DATA;
+        }
+        
         if (discardRepeatedRecord(newBusPosition, busNumber)) {
             return REPEATED;
         }
@@ -61,10 +65,6 @@ public class DiscardRecordHelper {
 
         if (discardDistanceHigherThanMax(newBusPosition, lastBusPosition)) {
             return DISTANCE_HIGHER;
-        }
-
-        if (discardInvalidData(newBusPosition)) {
-            return INVALID_DATA;
         }
 
         if (discardRecordWithoutLine(newBusPosition)) {
