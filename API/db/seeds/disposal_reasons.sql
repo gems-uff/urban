@@ -23,6 +23,7 @@ INSERT INTO disposal_reasons (id, name, created_at, updated_at) VALUES (4, 'Repe
 INSERT INTO disposal_reasons (id, name, created_at, updated_at) VALUES (5, 'Speed higher than 85.57 km/h', '2015-09-02 14:17:42', '2015-09-02 14:17:42');
 INSERT INTO disposal_reasons (id, name, created_at, updated_at) VALUES (6, 'Invalid data', '2015-09-02 14:17:42', '2015-09-02 14:17:42');
 INSERT INTO disposal_reasons (id, name, created_at, updated_at) VALUES (7, 'Data have not been updated', '2015-09-02 14:17:42', '2015-09-02 14:17:42');
+INSERT INTO disposal_reasons (id, name, created_at, updated_at) VALUES (8, 'Bus at the garage', '2015-09-02 14:17:42', '2015-09-02 14:17:42');
 
 --
 -- Name: disposal_reasons_id_seq; Type: SEQUENCE SET; Schema: public; Owner: schettino

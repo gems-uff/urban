@@ -27,8 +27,8 @@ public class IndexesDBUtils {
         dropIndex("index_loaded_files_on_start_time_and_filename");
 
         dropIndex("index_bus_positions_on_time_and_bus_id");
-        dropIndex("index_bus_positions_on_time");
-        dropIndex("index_bus_positions_on_bus_id");
+        //dropIndex("index_bus_positions_on_time");
+        //dropIndex("index_bus_positions_on_bus_id");
         dropIndex("index_bus_positions_on_line_id");
         dropIndex("index_bus_positions_on_position");
 
@@ -87,8 +87,8 @@ public class IndexesDBUtils {
         createUniqueIndex("index_loaded_files_on_start_time_and_filename", "loaded_files", new String[]{"start_time", "filename"});
 
         createSimpleIndex("index_bus_positions_on_time_and_bus_id", "bus_positions", new String[]{"time", "bus_id"});
-        createSimpleIndex("index_bus_positions_on_time", "bus_positions", new String[]{"time"});
-        createSimpleIndex("index_bus_positions_on_bus_id", "bus_positions", new String[]{"bus_id"});
+        //createSimpleIndex("index_bus_positions_on_time", "bus_positions", new String[]{"time"});
+        //createSimpleIndex("index_bus_positions_on_bus_id", "bus_positions", new String[]{"bus_id"});
         createSimpleIndex("index_bus_positions_on_line_id", "bus_positions", new String[]{"line_id"});
         con.commit();
         createSpartialIndex("index_bus_positions_on_position", "bus_positions", new String[]{"position"});

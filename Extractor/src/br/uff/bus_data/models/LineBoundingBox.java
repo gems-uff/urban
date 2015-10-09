@@ -19,9 +19,15 @@ public class LineBoundingBox {
 
     public LineBoundingBox() {
     }
-
     
-    public LineBoundingBox(long number, long minLat, long maxLat, long minLong,long maxLong) {
+    public LineBoundingBox(double minLat, double maxLat, double minLong,double maxLong) {
+        this.minLat = minLat;
+        this.maxLat = maxLat;
+        this.minLong = minLong;
+        this.maxLong = maxLong;
+    }
+    
+    public LineBoundingBox(long number, double minLat, double maxLat, double minLong,double maxLong) {
         this.lineId = number;
         this.minLat = minLat;
         this.maxLat = maxLat;

@@ -10,6 +10,7 @@ import br.uff.bus_data.models.LineBoundingBox;
 import java.sql.SQLException;
 import java.util.Map;
 import java.sql.Statement;
+import java.util.List;
 
 /**
  *
@@ -27,23 +28,40 @@ public class DiscardRecordHelper {
     private static final Long SPEED_HIGHER = 5l;
     private static final Long INVALID_DATA = 6l;
     private static final Long NOT_UPDATED = 7l;
+    private static final Long BUS_AT_GARAGE = 8l;
 
     private final BusPositionContainer busPositionsContainer;
     private final Map<Long, LineBoundingBox> lineBoundingBoxHash;
+    private final List<LineBoundingBox> garageList;
 
     public DiscardRecordHelper(Statement stmt) throws SQLException {
         busPositionsContainer = new BusPositionContainer(HashUtils.loadPosicoes(stmt));
         LineBoundingBoxDAO lineBoundingBoxDao = new LineBoundingBoxDAO();
         lineBoundingBoxDao.setStatement(stmt);
         lineBoundingBoxHash = lineBoundingBoxDao.all();
+        garageList = Constants.getGarageList();
+
     }
 
     public DiscardRecordHelper(BusPositionContainer bpContainer, Map<Long, LineBoundingBox> lineBBHash) {
         busPositionsContainer = bpContainer;
         lineBoundingBoxHash = lineBBHash;
+        garageList = Constants.getGarageList();
     }
 
     public Long disposalReason(BusPosition newBusPosition, BusPosition lastBusPosition, String busNumber) {
+
+        if (discardRepeatedRecord(newBusPosition, busNumber)) {
+            return REPEATED;
+        }
+
+        if (discardSpeedHigherThanMax(newBusPosition)) {
+            return SPEED_HIGHER;
+        }
+
+        if (discardDistanceHigherThanMax(newBusPosition, lastBusPosition)) {
+            return DISTANCE_HIGHER;
+        }
 
         if (discardInvalidData(newBusPosition)) {
             return INVALID_DATA;
@@ -57,16 +75,8 @@ public class DiscardRecordHelper {
             return BUS_OUT_OF_SERVICE;
         }
 
-        if (discardSpeedHigherThanMax(newBusPosition)) {
-            return SPEED_HIGHER;
-        }
-
-        if (discardRepeatedRecord(newBusPosition, busNumber)) {
-            return REPEATED;
-        }
-
-        if (discardDistanceHigherThanMax(newBusPosition, lastBusPosition)) {
-            return DISTANCE_HIGHER;
+        if (discardBusAtGarage(newBusPosition)) {
+            return BUS_AT_GARAGE;
         }
 
         return null;
@@ -106,6 +116,17 @@ public class DiscardRecordHelper {
             return ((!Double.isNaN(distance)) && (distance > MAX_DISTANCE
                     * DateHelper.minutesDiff(lastBusPosition.getTime(),
                             newBusPosition.getTime())));
+        }
+        return false;
+    }
+
+    private boolean discardBusAtGarage(BusPosition newBusPosition) {
+        if (newBusPosition.getSpeed() < (float) 1.0) {
+            for (LineBoundingBox lbb : garageList) {
+                if (lbb.isInside(newBusPosition)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
