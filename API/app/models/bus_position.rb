@@ -30,5 +30,18 @@ class BusPosition < ActiveRecord::Base
     BusPosition.where("ST_DWithin(position, 'POINT(#{params[:long]} #{params[:lat]})', #{params[:rad]})")
   end
 
+  #Params:long, lat, rad, time_begin, time_end, Line
+  def self.in_radius_time_line(long, lat, rad, time_begin, time_end, line)
+    BusPosition.where(:line_id => line.id).
+      where('time BETWEEN ? AND ?',time_begin, time_end).
+      where("ST_DWithin(position, 'POINT(#{long} #{lat})', #{rad})")
+  end
+
+  def self.track_bus_id_in_time(bus_id,time_begin, time_end )
+    BusPosition.where(:bus_id => bus_id).
+      where('time BETWEEN ? AND ?',time_begin, time_end).
+      order(:time)
+  end
+
 
 end

@@ -40,4 +40,23 @@ class QueryHelper
 	and
 	ST_DWithin(bp.position, ST_SetSRID(ST_MakePoint(ST_X(ST_AsEWKT(lp.position)), ST_Y(ST_AsEWKT(lp.position))),4326), 15)"
   end
+
+  #:line_id, :frequency, :time_ago, :tol, :depart_time, :long, :lat, :rad
+  def self.radius_time_week(params)
+    query =  "SELECT bus_id, time, ST_Y(ST_AsEWKT(position)) as latitude, ST_X(ST_AsEWKT(position)) as longitude "
+    query += "FROM bus_positions WHERE line_id = #{params[:line_id]} "
+    if(params[:frequency] == "week")
+      query += "AND ("
+      for i in 1..params[:time_ago]+1
+        days_ago = i * 7
+        depart_time_minus_tol = ((params[:depart_time].to_datetime - days_ago.days) - params[:tol].minutes).strftime("%Y-%m-%d %H:%M:%S")
+        depart_time_plus_tol  = ((params[:depart_time].to_datetime - days_ago.days) + params[:tol].minutes).strftime("%Y-%m-%d %H:%M:%S")
+        query += "(time BETWEEN '#{depart_time_minus_tol}' AND '#{depart_time_plus_tol}') OR "
+      end
+
+      query += "(1 = 2))"
+    end
+    query += "AND ST_DWithin(position, 'POINT(#{params[:long]} #{params[:lat]})', #{params[:rad]}) ORDER BY bus_id, time "
+
+  end
 end

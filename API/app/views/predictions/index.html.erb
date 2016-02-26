@@ -1,0 +1,349 @@
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+
+<%- model_class = BusPosition -%>
+<div class="page-header">
+  <h1>Prediction</h1>
+</div>
+<form role="form" id="form_line">
+  <div class="col-md-5">
+    <div class="form-group">
+      <label for="line" class="col-sm-2 control-label">Line Number</label>
+
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="line" placeholder="Enter line number">
+      </div>
+    </div>
+  </div>
+</form>
+
+<form role="form" id="form_prediction">
+<!-- <div>
+  <label for="long_stop_orig" class="col-sm-2 control-label">Long stop orig</label>
+  <input type="text" class="form-control" id="long_stop_orig" placeholder="Click line stop origin">
+</div><div>
+  <label for="lat_stop_orig" class="col-sm-2 control-label">Lat stop orig</label>
+  <input type="text" class="form-control" id="lat_stop_orig" placeholder="Click line stop origin">
+</div><div>
+  <label for="long_stop_dest" class="col-sm-2 control-label">Long stop destino</label>
+  <input type="text" class="form-control" id="long_stop_dest" placeholder="Click line stop destiny">
+</div><div>
+  <label for="lat_stop_dest" class="col-sm-2 control-label">Lat stop destino</label>
+  <input type="text" class="form-control" id="lat_stop_dest" placeholder="Click line stop destiny">
+</div>-->
+<div  class="col-md-5">
+  <div class="col-md-1">
+    <input type="radio" name="query-type" value="arrival" class="vcenter dow-radio" checked="checked">
+  <!-- </div>
+  <div class="col-md-1"> -->
+    <input type="radio" name="query-type" class="vcenter date-radio" value="depart">
+  </div>
+
+  <label id='time_name' for="depart_time" class="col-sm-2 control-label">Arrival Time</label>
+  <div class="col-sm-6">
+    <div class="form-group">
+      <label for="depart_date" class="control-label col-md-4">Date</label>
+
+      <div class="col-md-7">
+        <input type="text" class="datepicker form-control input-sm" id="depart_date" placeholder="Choose a date">
+      </div>
+
+    </div>
+    <input type="text" class="form-control" id="depart_hour" placeholder="Enter Time (hh:mm)">
+  </div>
+  <input type="submit" id="form-submit" class="btn btn-primary btn-sm">
+  <div class="col-sm-9">
+    <label for="confidence" class="control-label col-md-4">Confidence</label>
+
+    <select id="confidence">
+      <option value="75">75%</option>
+      <option value="90" selected="selected">90%</option>
+      <option value="95">95%</option>
+      <option value="99">99%</option>
+    </select>
+  </div>
+</div>
+<div  class="col-md-5">
+  <label for="prediction_label" class="col-sm-2 control-label">Prediction: </label><br/>
+  <label id='prediction_label'> </label><br/>
+<!-- </div>
+<div> -->
+  <input type='text' id='text_log' />
+<!-- </div>
+<div> -->
+  <input type='text' id='text_msg' />
+</div>
+</form>
+<div class="row">
+  <div id="map-canvas" style="height: 800px; width: 100%"></div>
+</div>
+
+<script>
+
+    var map;
+    var mc;
+    var orig;
+    var mcOptions = {
+        gridSize: 50,
+        maxZoom: 15
+    };
+    var IsArrivalTime;
+
+
+    function initialize() {
+        var mapOptions = {
+            zoom: 11,
+            center: new google.maps.LatLng(-22.9444308, -43.3841082),
+            mapTypeControl: true,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+            },
+            navigationControl: true,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+        orig = true;
+        mc = new MarkerClusterer(map, [], mcOptions);
+        document.getElementById("form_prediction").reset();
+        document.getElementById("form_line").reset();
+        IsArrivalTime = true;
+        $('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
+    }
+    var fp = []
+
+    var flightPath = new google.maps.Polyline({
+        path: fp,
+        strokeColor: "#0000FF",
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+
+    // Add a polyline to the map and push to the array.
+    function addPolyline(lat, long) {
+        var polyline = new google.maps.LatLng(lat, long);
+        fp.push(polyline);
+    }
+
+
+    // Removes the fp from the map, but keeps them in the array.
+    function clearPolylines() {
+        flightPath.setMap(null)
+    }
+
+    // Shows any fp currently in the array.
+    function showPolylines() {
+        flightPath.setPath(fp);
+        flightPath.setMap(map);
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < fp.length; i++) {
+            bounds.extend(fp[i]);
+        }
+        map.fitBounds(bounds);
+    }
+
+    // Deletes all fp in the array by removing references to them.
+    function deletePolylines() {
+        clearPolylines();
+        fp = [];
+    }
+
+
+    $(function () {
+        var availableLines = <%= raw @lines.to_json %>;
+        $("#line").autocomplete({
+            source: availableLines,
+            select: function (event, ui) {
+                line = this.value
+                $("#form_line").submit();
+            }
+        });
+
+
+    });
+
+    var line;
+    var lat_stop_orig;
+    var long_stop_orig;
+    var lat_stop_dest;
+    var long_stop_dest;
+    var lat_next_stop_orig;
+    var long_next_stop_orig;
+    var lat_next_stop_dest;
+    var long_next_stop_dest;
+    var confidence;
+
+
+    var depart_time;
+
+    $("#form_line").submit(function (e) {
+        e.preventDefault();
+        if (line == null)
+            line = $("#line").val();
+
+        $.get('<%=with_stops_api_v1_line_positions_path%>', { line: line, format: 'json' })
+            .done(function (data) {
+
+              stops = data.stops
+              clearMarkers();
+              deleteMarkers();
+              for (var i = 0; i < stops.length-1; i++) {
+                  addMarkerStop(new google.maps.LatLng(stops[i]['latitude'],
+                                          stops[i]['longitude']),
+                                          stops[i+1]['latitude'],
+                                          stops[i+1]['longitude']);
+              }
+              addMarkerStop(new google.maps.LatLng(stops[stops.length-1]['latitude'],
+                                        stops[stops.length-1]['longitude']),
+                                        stops[0]['latitude'],
+                                        stops[0]['longitude']);
+              showMarkers();
+              line = null;
+
+        });
+    });
+
+    $("#form_prediction").submit(function (e) {
+        e.preventDefault();
+
+        // if (lat_stop_orig == null)
+        //     lat_stop_orig = $("#lat_stop_orig").val();
+        //
+        // // if (long_stop_orig == null)
+        //     long_stop_orig = $("#long_stop_orig").val();
+        //
+        // // if (lat_stop_dest == null)
+        //     lat_stop_dest = $("#lat_stop_dest").val();
+        //
+        // // if (long_stop_dest == null)
+        //     long_stop_dest = $("#long_stop_dest").val();
+
+      //  if (line == null)
+          line = $("#line").val();
+          depart_time = $("#depart_date").val() + " " + $("#depart_hour").val();
+          confidence = $("#confidence").val();
+
+          if(IsArrivalTime){
+              alert("Vai chamar com Tempo de Chegada (Arrival)");
+            $.get('<%=time_prediction_d_to_o_api_v1_track_buses_path%>', { line: line,
+               lat_stop_orig: lat_stop_orig, long_stop_orig: long_stop_orig,
+               lat_stop_dest: lat_stop_dest, long_stop_dest: long_stop_dest,
+               lat_next_stop_dest: lat_next_stop_dest, long_next_stop_dest: long_next_stop_dest,
+               depart_time: depart_time, confidence: confidence, format: 'json' })
+                    .done(function (data) {
+                      alert("Carregou!");
+                      var tempo = data.time;
+                      $('#prediction_label').text(tempo);
+                      document.getElementById("text_log").value= data.information;
+                      document.getElementById("text_msg").value= data.message;
+                    });
+
+          }else{
+            alert("Vai chamar com Tempo de Saída (Depart)" + confidence);
+          $.get('<%=time_prediction_o_to_d_api_v1_track_buses_path%>', { line: line,
+             lat_stop_orig: lat_stop_orig, long_stop_orig: long_stop_orig,
+             lat_stop_dest: lat_stop_dest, long_stop_dest: long_stop_dest,
+             lat_next_stop_orig: lat_next_stop_orig, long_next_stop_orig: long_next_stop_orig,
+             depart_time: depart_time, confidence: confidence, format: 'json' })
+                  .done(function (data) {
+                    alert("Carregou!");
+                    var tempo = data.time;
+                    $('#prediction_label').text(tempo);
+                    document.getElementById("text_log").value= data.information;
+                    document.getElementById("text_msg").value= data.message;
+                  });
+          }
+    });
+
+    var markers = []
+    var markOrig;
+    var markDest;
+
+    // Add a marker to the map and push to the array.
+    function addMarkerStop(location, latitudeNextStop, longitudeNextStop) {
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            icon: new google.maps.MarkerImage('<%=asset_path 'bus_arrow.png'%>'),
+            zIndex: Math.round(location.lat() * -100000) << 5
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+
+          if(orig){
+            lat_stop_orig= marker.getPosition().lat();
+            long_stop_orig= marker.getPosition().lng();addMarkerStop
+            lat_next_stop_orig= latitudeNextStop;
+            long_next_stop_orig= longitudeNextStop;
+
+            if(markOrig != null){
+               markOrig.setIcon('<%=asset_path 'bus_arrow.png'%>')
+            }
+            marker.setIcon('<%=asset_path 'o.png'%>')
+            orig = false;
+            markOrig = marker;
+          }else{
+            lat_stop_dest= marker.getPosition().lat();
+            long_stop_dest= marker.getPosition().lng();
+            lat_next_stop_dest= latitudeNextStop;
+            long_next_stop_dest= longitudeNextStop;
+
+            if(markDest != null){
+               markDest.setIcon('<%=asset_path 'bus_arrow.png'%>')
+            }
+            marker.setIcon('<%=asset_path 'd.png'%>')
+            orig = true;
+            markDest = marker;
+          }
+
+
+        });
+        markers.push(marker);
+    }
+
+    // Sets the map on all markers in the array.
+    function setAllMap(map) {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
+        }
+    }
+
+    // Removes the markers from the map, but keeps them in the array.
+    function clearMarkers() {
+        setAllMap(null);
+        mc.clearMarkers();
+
+    }
+
+    // Shows any markers currently in the array.
+    function showMarkers() {
+        setAllMap(map);
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < markers.length; i++) {
+            bounds.extend(markers[i].position);
+        }
+        mc = new MarkerClusterer(map, markers, mcOptions);
+        map.fitBounds(bounds);
+    }
+
+    // Deletes all markers in the array by removing references to them.
+    function deleteMarkers() {
+        clearMarkers();
+        markers = [];
+    }
+
+    $("input[name=query-type]").change(function () {
+        if ($(this).val() == "arrival") {
+            IsArrivalTime = true;
+            $('#time_name').text("Arrival time");
+
+        } else if ($(this).val() == "depart") {
+            IsArrivalTime = false;
+            $('#time_name').text("Depart time");
+        }
+    });
+
+    window.onload = initialize;
+
+
+</script>

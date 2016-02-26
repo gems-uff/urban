@@ -1,0 +1,224 @@
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+<%- model_class = LinePosition -%>
+<div class="page-header">
+  <h1><%= t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+
+<div class="col-md-12 row" style="margin-bottom: 30px">
+
+  <form role="form" id="form">
+    <div class="col-md-5">
+      <div class="form-group">
+        <label for="line" class="col-sm-2 control-label">Line Number</label>
+
+        <div class="col-sm-6">
+          <input type="text" class="form-control" id="line" placeholder="Enter line number">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="show_stops" class="col-sm-4 control-label">Show stops</label>
+
+        <div class="col-sm-6">
+          <input id="show_stops" type="checkbox" name="show_stops" data-on-text="YES" data-off-text="NO" checked data-size="small" data-on-color="success" data-off-color="danger">
+        </div>
+      </div>
+    </div>
+    <div>
+      <label for="depart_time" class="col-sm-2 control-label">Depart Time</label>
+
+        <div class="col-md-7">
+          <input type="text" class="datepicker form-control input-sm" id="date-selection" placeholder="Choose a date">
+        </div>
+
+      </div>
+      <input type="text" class="form-control" id="depart_time" placeholder="Enter Depart Time">
+    </div>
+    <div>
+      <input type="submit" id="form-submit" class="btn btn-primary btn-sm">
+    </div>
+  </form>
+
+</div>
+
+<div class="row">
+  <div id="map-canvas" style="height: 800px; width: 100%"></div>
+</div>
+
+<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+
+
+<script>
+
+    var map;
+    var mc;
+    var mcOptions = {
+        gridSize: 50,
+        maxZoom: 15
+    };
+
+
+    function initialize() {
+        var mapOptions = {
+            zoom: 11,
+            center: new google.maps.LatLng(-22.9444308, -43.3841082),
+            mapTypeControl: true,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+            },
+            navigationControl: true,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+        mc = new MarkerClusterer(map, [], mcOptions);
+
+    }
+    var fp = []
+
+    var flightPath = new google.maps.Polyline({
+        path: fp,
+        strokeColor: "#0000FF",
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+
+    // Add a polyline to the map and push to the array.
+    function addPolyline(lat, long) {
+        var polyline = new google.maps.LatLng(lat, long);
+        fp.push(polyline);
+    }
+
+
+    // Removes the fp from the map, but keeps them in the array.
+    function clearPolylines() {
+        flightPath.setMap(null)
+    }
+
+    // Shows any fp currently in the array.
+    function showPolylines() {
+        flightPath.setPath(fp);
+        flightPath.setMap(map);
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < fp.length; i++) {
+            bounds.extend(fp[i]);
+        }
+        map.fitBounds(bounds);
+    }
+
+    // Deletes all fp in the array by removing references to them.
+    function deletePolylines() {
+        clearPolylines();
+        fp = [];
+    }
+
+
+    $(function () {
+        var availableLines = <%= raw @lines.to_json %>;
+        $("#line").autocomplete({
+            source: availableLines,
+            select: function (event, ui) {
+                line = this.value
+                $("#form").submit();
+            }
+        });
+
+
+    });
+
+    var line;
+    var depart_time;
+
+    $("#form").submit(function (e) {
+        e.preventDefault();
+        if (line == null)
+            line = $("#line").val();
+
+        $.get('<%=with_stops_api_v1_line_positions_path%>', { line: line, format: 'json' })
+                .done(function (data) {
+                    positions = data.positions
+                    stops = data.stops
+                    deleteMarkers();
+                    deletePolylines();
+                    for (var i = 0; i < positions.length; i++) {
+                        addPolyline(bus_positions[i][1],
+                                bus_positions[i][0]);
+                    }
+                    for (var i = 0; i < stops.length; i++) {
+                        addMarker(new google.maps.LatLng(stops[i]['latitude'], stops[i]['longitude']));
+                    }
+                    showPolylines();
+
+                    if ($('input[name="show_stops"]').bootstrapSwitch('state')) {
+                        showMarkers();
+                    }else{
+                        clearMarkers();
+                    }
+                    line = null;
+                });
+    });
+
+
+    var markers = []
+
+
+
+    // Add a marker to the map and push to the array.
+    function addMarker(location) {
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            icon: new google.maps.MarkerImage('<%=asset_path 'bus_arrow.png'%>'),
+            zIndex: Math.round(location.lat() * -100000) << 5
+        });
+
+        markers.push(marker);
+
+
+    }
+
+    // Sets the map on all markers in the array.
+    function setAllMap(map) {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
+        }
+    }
+
+    // Removes the markers from the map, but keeps them in the array.
+    function clearMarkers() {
+        setAllMap(null);
+        mc.clearMarkers();
+
+    }
+
+    // Shows any markers currently in the array.
+    function showMarkers() {
+        setAllMap(map);
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < markers.length; i++) {
+            bounds.extend(markers[i].position);
+        }
+        mc = new MarkerClusterer(map, markers, mcOptions);
+        map.fitBounds(bounds);
+    }
+
+    // Deletes all markers in the array by removing references to them.
+    function deleteMarkers() {
+        clearMarkers();
+        markers = [];
+    }
+
+    $('input[name="show_stops"]').bootstrapSwitch();
+    $('input[name="show_stops"]').on('switchChange.bootstrapSwitch', function(event, state) {
+        if (state) {
+            showMarkers();
+        } else {
+            clearMarkers();
+        }
+    });
+
+    window.onload = initialize;
+
+
+</script>

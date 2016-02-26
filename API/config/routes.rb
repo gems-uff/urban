@@ -29,10 +29,19 @@ Rails.application.routes.draw do
           get :from_line
         end
       end
+      resources :track_buses, :only => [] do
+        collection do
+          get :time_prediction_o_to_d
+          get :time_prediction_d_to_o
+          get :track
+        end
+      end
     end
   end
   resources :line_stops, :only => [:index]
   resources :line_positions, :only => [:index]
+  resources :predictions, :only => [:index]
+  resources :track_buses, :only => [:index]
   resources :heat_maps, :only => [] do
     collection do
       get :position
