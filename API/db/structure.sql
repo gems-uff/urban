@@ -301,6 +301,49 @@ CREATE TABLE schema_migrations (
 
 
 --
+-- Name: sys_configs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE sys_configs (
+    id integer NOT NULL,
+    positions_hm_range_1 double precision DEFAULT (-15),
+    positions_hm_range_2 double precision DEFAULT (-5),
+    positions_hm_range_3 double precision DEFAULT 5,
+    positions_hm_range_4 double precision DEFAULT 20,
+    speed_hm_diff_range_1 double precision DEFAULT (-20),
+    speed_hm_diff_range_2 double precision DEFAULT (-5),
+    speed_hm_diff_range_3 double precision DEFAULT 5,
+    speed_hm_diff_range_4 double precision DEFAULT 20,
+    speed_hm_query_range_1 double precision DEFAULT 15,
+    speed_hm_query_range_2 double precision DEFAULT 30,
+    speed_hm_query_range_3 double precision DEFAULT 60,
+    bounding_box_gap double precision DEFAULT 0.001,
+    search_radius double precision DEFAULT 15,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: sys_configs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE sys_configs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: sys_configs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE sys_configs_id_seq OWNED BY sys_configs.id;
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -357,6 +400,13 @@ ALTER TABLE ONLY loaded_files ALTER COLUMN id SET DEFAULT nextval('loaded_files_
 
 
 --
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY sys_configs ALTER COLUMN id SET DEFAULT nextval('sys_configs_id_seq'::regclass);
+
+
+--
 -- Name: bus_positions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -378,14 +428,6 @@ ALTER TABLE ONLY buses
 
 ALTER TABLE ONLY disposal_reasons
     ADD CONSTRAINT disposal_reasons_pkey PRIMARY KEY (id);
-
-
---
--- Name: disposals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY disposals
-    ADD CONSTRAINT disposals_pkey PRIMARY KEY (id);
 
 
 --
@@ -421,10 +463,11 @@ ALTER TABLE ONLY loaded_files
 
 
 --
--- Name: index_bus_positions_on_bus_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: sys_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_bus_positions_on_bus_id ON bus_positions USING btree (bus_id);
+ALTER TABLE ONLY sys_configs
+    ADD CONSTRAINT sys_configs_pkey PRIMARY KEY (id);
 
 
 --
@@ -446,13 +489,6 @@ CREATE INDEX index_bus_positions_on_position ON bus_positions USING gist ("posit
 --
 
 CREATE INDEX index_bus_positions_on_time ON bus_positions USING btree ("time");
-
-
---
--- Name: index_bus_positions_on_time_and_bus_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_bus_positions_on_time_and_bus_id ON bus_positions USING btree ("time", bus_id);
 
 
 --
@@ -481,13 +517,6 @@ CREATE INDEX index_disposals_on_disposal_reason_id ON disposals USING btree (dis
 --
 
 CREATE INDEX index_disposals_on_line_id ON disposals USING btree (line_id);
-
-
---
--- Name: index_disposals_on_position; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_disposals_on_position ON disposals USING gist ("position");
 
 
 --
@@ -567,4 +596,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140414031450');
 INSERT INTO schema_migrations (version) VALUES ('20140922035218');
 
 INSERT INTO schema_migrations (version) VALUES ('20140922035534');
+
+INSERT INTO schema_migrations (version) VALUES ('20160228134001');
 

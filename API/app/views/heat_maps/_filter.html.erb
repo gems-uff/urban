@@ -48,8 +48,7 @@
     function buildVariables() {
         if ($('#diff').hasClass('active')) {
 
-            if (line == null || line == "")
-                line = $("#line_diff").val();
+            line = $("#line_diff").val();
             if (!$('#day_of_week-select_diff_base').prop('disabled') && $('#day_of_week-select_diff_base').val() != "")
                 dow = $('#day_of_week-select_diff_base').val();
             if (!$('#date-selection_diff_base').prop('disabled') && $('#date-selection_diff_base').val() != "")

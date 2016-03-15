@@ -13,6 +13,7 @@ class Disposal < ActiveRecord::Base
   belongs_to :bus
   belongs_to :line
   belongs_to :loaded_file
+  belongs_to :disposal_reason
 
   delegate :bus_number, to: :bus
   delegate :line_number, to: :line, :allow_nil => true

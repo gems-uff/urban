@@ -21,6 +21,7 @@
                 time_begin: time_begin_diff}, format: 'json'})
                 .done(function (data) {
                     prepareMap(data);
+                    config = data.config;
 
                     for (var i = 0; i < stops.length; i++) {
                         addMarker(new google.maps.LatLng(stops[i]['latitude'], stops[i]['longitude']));
@@ -28,16 +29,18 @@
 
                     if ($('#diff').hasClass('active')) {
                         for (var i = 0; i < bus_positions.length - 1; i++) {
-                            var color = "#ff4d4d"
+                            var color = "#ff0000"
                             var count = bus_positions[i][2];
-                            if (count > 20) {
-                                color = "#00cd00"
-                            } else if (count > 5 && count < 20) {
-                                color = "#ffff4d"
-                            } else if (count > -5 && count < 5)
-                                color = "#000000"
-                            if (count < -5 && count > -15) {
-                                color = "#ffc04d"
+
+
+                            if (count > config.positions_hm_range_4) {
+                                color = "#00d204"
+                            } else if (count >= config.positions_hm_range_3 && count <= config.positions_hm_range_4) {
+                                color = "#008080"
+                            } else if (count >= config.positions_hm_range_2 && count <= config.positions_hm_range_3){
+                                color = "#909090"
+                            } else if (count >= config.positions_hm_range_1 && count <= config.positions_hm_range_2) {
+                                color = "#900000"
                             }
 
                             var fp = [new google.maps.LatLng(bus_positions[i][1], bus_positions[i][0]),

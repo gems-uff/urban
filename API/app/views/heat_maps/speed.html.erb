@@ -22,6 +22,7 @@
                 .done(function (data) {
 
                     prepareMap(data);
+                    config = data.config;
 
                     for (var i = 0; i < stops.length; i++) {
                         addMarker(new google.maps.LatLng(stops[i]['latitude'], stops[i]['longitude']));
@@ -32,32 +33,33 @@
                     }
                     else {
                         for (var i = 0; i < bus_positions.length - 1; i++) {
-                            var color = "#ff4d4d"
+                            var color = "#ff0000"
                             var speed = bus_positions[i][2];
                             if ($('#diff').hasClass('active')) {
+
                                 //speed diff
-                                if (speed > 20) {
-                                    color = "#00cd00"
-                                } else if (speed > 5 && speed < 20) {
-                                    color = "#ffff4d"
-                                } else if (speed > -5 && speed < 5)
-                                    color = "#000000"
-                                if (speed < -5 && speed > -20) {
-                                    color = "#ffc04d"
+                                if (speed >= config.speed_hm_diff_range_4) {
+                                    color = "#00d204"
+                                } else if (speed >= config.speed_hm_diff_range_3 && speed <= config.speed_hm_diff_range_4) {
+                                    color = "#008080"
+                                } else if (speed >= config.speed_hm_diff_range_2 && speed <= config.speed_hm_diff_range_3){
+                                    color = "#909090"
+                                }else if (speed >= config.speed_hm_diff_range_1 && speed >= config.speed_hm_diff_range_2) {
+                                    color = "#900000"
                                 }
                             }
                             else {
                                 //actual speed
-                                if (speed > 60) {
-                                    color = "#00cd00"
-                                } else if (speed > 30 && speed < 60) {
-                                    color = "#ffff4d"
-                                } else if (speed > 15 && speed < 30) {
-                                    color = "#ffc04d"
+                                if (speed >=  config.speed_hm_query_range_3) {
+                                    color = "#00d204"
+                                } else if (speed >= config.speed_hm_query_range_2 && speed <= config.speed_hm_query_range_3) {
+                                    color = "#008080"
+                                } else if (speed >= config.speed_hm_query_range_1 && speed <= config.speed_hm_query_range_2) {
+                                    color = "#900000"
+                                } else if (speed <= config.speed_hm_query_range_1) {
+                                    color = "#ff0000"
                                 }
-                                else if (speed < 0) {
-                                    color = "#000000"
-                                }
+
                             }
 
                             var fp = [new google.maps.LatLng(bus_positions[i][1], bus_positions[i][0]),

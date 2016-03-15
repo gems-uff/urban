@@ -2,29 +2,31 @@ class Api::V1::BusPositionsController < ApplicationController
 
   respond_to :json, :xml
 
-  #Entrada: número da linha
-
-  #Saída:
-  #{
-  #line: XXX,
-  #monday: [speed_1, ..., speed_24 ]
-  #tuesday: [speed_1, ..., speed_24 ]
-  #...
-  #sunday: [speed_1, ..., speed_24 ]
-  #}
-  def from_current_week
+  def statistics
     respond_with({:code => HttpResponse::CODE_ERROR_MISSING_PARAMETER, :message => HttpResponse.code_msg(HttpResponse::CODE_ERROR_MISSING_PARAMETER) + 'line'}) and return unless params[:line]
     begin
       line = Line.where(:line_number => params[:line]).last
 
       respond_with({:code => HttpResponse::CODE_LINE_NOT_FOUND, :message => HttpResponse.code_msg(HttpResponse::CODE_LINE_NOT_FOUND)}) and return unless line
 
-      data = BusPosition.from_week(line)
+      data = BusPosition.statistics(line)
+
       resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :line => params[:line], :data => {}}
       data.each do |d|
-        wday = d.time.strftime('%A')
-        resp[:data][wday] = [] unless resp[:data][wday]
-        resp[:data][wday] << d.speed
+        wday = {
+                "0" => 'sunday',
+                "1" => 'monday',
+                "2" => 'tuesday',
+                "3" => 'wenesday',
+                "4" => 'thursday',
+                "5" => 'friday',
+                "6" => 'saturday'
+              }.fetch(d.dow.to_i.to_s)
+        default_array = [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
+
+        resp[:data][wday] ||= { speed: default_array.dup, count: default_array.dup }
+        resp[:data][wday][:speed][d.time.to_i] = d.speed
+        resp[:data][wday][:count][d.time.to_i] = d.count
       end
 
       respond_with(resp)
@@ -61,7 +63,7 @@ class Api::V1::BusPositionsController < ApplicationController
 
       respond_with({:code => HttpResponse::CODE_BUS_NOT_FOUND, :message => HttpResponse.code_msg(HttpResponse::CODE_BUS_NOT_FOUND)}) and return unless bus
 
-      data = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(bp.position)) as longitude, ST_Y(ST_AsEWKT(bp.position)) as latitude, bp.speed, l.line_number FROM bus_positions bp join lines l on l.id = bp.line_id WHERE bp.bus_id = #{bus.id}")
+      data = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(bp.position)) as longitude, ST_Y(ST_AsEWKT(bp.position)) as latitude, bp.speed, l.line_number, bp.time FROM bus_positions bp join lines l on l.id = bp.line_id WHERE bp.bus_id = #{bus.id}")
 
       resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :columns => data.columns, :data => data.rows}
 
@@ -74,13 +76,12 @@ class Api::V1::BusPositionsController < ApplicationController
   end
 
   def on_radius
-
     respond_with({:code => HttpResponse::CODE_ERROR_MISSING_PARAMETER, :message => HttpResponse.code_msg(HttpResponse::CODE_ERROR_MISSING_PARAMETER) + 'lat'}) and return unless params[:lat]
     respond_with({:code => HttpResponse::CODE_ERROR_MISSING_PARAMETER, :message => HttpResponse.code_msg(HttpResponse::CODE_ERROR_MISSING_PARAMETER) + 'long'}) and return unless params[:long]
     respond_with({:code => HttpResponse::CODE_ERROR_MISSING_PARAMETER, :message => HttpResponse.code_msg(HttpResponse::CODE_ERROR_MISSING_PARAMETER) + 'rad'}) and return unless params[:rad]
 
     begin
-      data = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(bp.position)) as longitude, ST_Y(ST_AsEWKT(bp.position)) as latitude, bp.speed, b.bus_number FROM bus_positions bp join lines l on l.id = bp.line_id inner join buses b on b.id = bp.bus_id WHERE ST_DWithin(bp.position, 'POINT(#{params[:long]} #{params[:lat]})', #{params[:rad]})")
+      data = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(bp.position)) as longitude, ST_Y(ST_AsEWKT(bp.position)) as latitude, bp.speed, b.bus_number, l.line_number, bp.time FROM bus_positions bp join lines l on l.id = bp.line_id inner join buses b on b.id = bp.bus_id WHERE ST_DWithin(bp.position, 'POINT(#{params[:long]} #{params[:lat]})', #{params[:rad]})")
 
       resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :columns => data.columns, :data => data.rows}
 
@@ -94,13 +95,12 @@ class Api::V1::BusPositionsController < ApplicationController
 
   def with_line_stops_and_positions
     respond_with({:code => HttpResponse::CODE_ERROR_MISSING_PARAMETER, :message => HttpResponse.code_msg(HttpResponse::CODE_ERROR_MISSING_PARAMETER) + 'line'}) and return unless params[:line]
+
     begin
       line = Line.where(:line_number => params[:line]).last
 
       respond_with({:code => HttpResponse::CODE_LINE_NOT_FOUND, :message => HttpResponse.code_msg(HttpResponse::CODE_LINE_NOT_FOUND)}) and return unless line
-
       positions = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(line_positions.position)) as longitude, ST_Y(ST_AsEWKT(line_positions.position)) as latitude FROM line_positions WHERE line_positions.line_id = #{line.id} ORDER BY line_positions.shape_id ASC, line_positions.sequence_number ASC")
-
       stops = ActiveRecord::Base.connection.select_all("SELECT ST_X(ST_AsEWKT(line_stops.position)) as longitude, ST_Y(ST_AsEWKT(line_stops.position)) as latitude FROM line_stops WHERE line_stops.line_id = #{line.id} ORDER BY line_stops.sequence_number ASC")
 
 
@@ -126,9 +126,7 @@ class Api::V1::BusPositionsController < ApplicationController
         query = QueryHelper.append("SELECT ST_X(ST_AsEWKT(bus_positions.position)) as longitude, ST_Y(ST_AsEWKT(bus_positions.position)) as latitude FROM bus_positions WHERE bus_positions.line_id = #{line.id}", params)
       end
       data = ActiveRecord::Base.connection.select_all(query)
-
-      resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :columns => data.columns, :data => data.rows, :positions => positions, :stops => stops}
-
+      resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :columns => data.columns, :data => data.rows, :positions => positions, :stops => stops, :config => SysConfig.config.positions_hm}
       respond_with(resp)
 
     rescue Exception => e
@@ -136,8 +134,6 @@ class Api::V1::BusPositionsController < ApplicationController
                     :message => HttpResponse.code_msg(HttpResponse::CODE_UNKNOWN_ERROR) + e.message})
     end
   end
-
-
 
   def with_line_stops_positions_and_speed_avg
     respond_with({:code => HttpResponse::CODE_ERROR_MISSING_PARAMETER, :message => HttpResponse.code_msg(HttpResponse::CODE_ERROR_MISSING_PARAMETER) + 'line'}) and return unless params[:line]
@@ -157,6 +153,7 @@ class Api::V1::BusPositionsController < ApplicationController
       query += ") as q
  group by seq_num, shape, longitude, latitude
  order by shape, seq_num"
+      config = SysConfig.config.speed_hm_query
 
       if (params[:diff])
         query2 = QueryHelper.union_query("speed", line.id)
@@ -168,11 +165,12 @@ class Api::V1::BusPositionsController < ApplicationController
  order by shape, seq_num"
 
         query = "SELECT q1.longitude, q1.latitude, (q2.speed - q1.speed) as speed, q1.seq_num, q1.shape from (#{query}) q1 INNER JOIN (#{query2}) q2 on q1.shape = q2.shape and q2.seq_num = q1.seq_num "
+        config = SysConfig.config.speed_hm_diff
       end
 
       data = ActiveRecord::Base.connection.select_all(query) || []
 
-      resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :columns => data.columns, :data => data.rows, :stops => stops}
+      resp = {:code => HttpResponse::CODE_SUCCESS, :message => HttpResponse.code_msg(HttpResponse::CODE_SUCCESS), :columns => data.columns, :data => data.rows, :stops => stops, :config => config}
 
       File.open("#{params[:line]}-#{params[:date]}.json","w") do |f|
         f.write(resp.to_json)
@@ -185,6 +183,4 @@ class Api::V1::BusPositionsController < ApplicationController
                     :message => HttpResponse.code_msg(HttpResponse::CODE_UNKNOWN_ERROR) + e.message})
     end
   end
-
-
 end

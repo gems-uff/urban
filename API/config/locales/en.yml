@@ -29,3 +29,28 @@ en:
         error_mis_param: "Parâmetros não informados: "
         line_not_found: "Linha não encontrada"
         bus_not_found: "Ônibus não encontrado"
+
+  activerecord:
+    models:
+      sys_config:
+        one: Configuration
+        other: Configurations
+    attributes:
+      sys_config:
+        positions_hm_range_1: Range 1
+        positions_hm_range_2: Range 2
+        positions_hm_range_3: Range 3
+        positions_hm_range_4: Range 4
+
+        speed_hm_diff_range_1: Range 1
+        speed_hm_diff_range_2: Range 2
+        speed_hm_diff_range_3: Range 3
+        speed_hm_diff_range_4: Range 4
+
+        speed_hm_query_range_1: Range 1
+        speed_hm_query_range_2: Range 2
+        speed_hm_query_range_3: Range 3
+        speed_hm_query_range_4: Range 4
+
+        bounding_box_gap: Bounding box gap
+        search_radius: Search radius

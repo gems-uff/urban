@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :bus_positions, :only => [] do
         collection do
-          get :from_current_week
+          get :statistics
           get :line_history
           get :bus_history
           get :on_radius
@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     end
   end
   resources :line_stops, :only => [:index]
+  resources :sys_configs, :only => [:edit, :update]
   resources :line_positions, :only => [:index]
   resources :heat_maps, :only => [] do
     collection do

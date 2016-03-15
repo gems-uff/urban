@@ -40,7 +40,7 @@ class Api::V1::LinePositionsController < ApplicationController
       stops.each do |d|
         resp[:stops] << d.to_hash(LineStop.get_fields)
       end
-      gap = 0.001
+      gap = SysConfig.config.bounding_box_gap
       resp[:bounding_box] = {:max_lat => bounding_box[0].to_f + gap, :min_lat => bounding_box[1].to_f - gap,:max_long => bounding_box[2].to_f + gap , :min_long => bounding_box[3].to_f - gap}
 
       respond_with(resp)

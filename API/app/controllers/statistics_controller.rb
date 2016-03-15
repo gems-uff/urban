@@ -5,8 +5,7 @@ class StatisticsController < ApplicationController
     @statistics = Statistic.new({})
     @data = []
     @data << ['Valid Data', @statistics.bus_positions]
-    @statistics.disposals.each{|s| @data << [s.disposal_reason, s.count]}
-
+    @statistics.disposals.each{|s| @data << [s.disposal_reason_id, s.count]}
   end
 
 end

@@ -27,7 +27,13 @@ class QueryHelper
 	bp.line_id = lp.line_id
 	where (lp.line_id = #{line_id})
 	and
-	ST_DWithin(bp.position, ST_SetSRID(ST_MakePoint(ST_X(ST_AsEWKT(lp.position)), ST_Y(ST_AsEWKT(lp.position))),4326), 15)"
+	ST_DWithin(bp.position, ST_SetSRID(ST_MakePoint(ST_X(ST_AsEWKT(lp.position)), ST_Y(ST_AsEWKT(lp.position))),4326), #{SysConfig.config.search_radius})"
+  end
+
+  def self.avg_speed
+    'SELECT ST_X(ST_AsEWKT(lp.position)) as longitude, ST_Y(ST_AsEWKT(lp.position)) as latitude , coalesce(bp.speed, 0) as speed
+	bus_positions bp
+where 1=1'
   end
 
   def self.count_query(line_id)
@@ -38,6 +44,6 @@ class QueryHelper
 	bp.line_id = lp.line_id
 	where (lp.line_id = #{line_id})
 	and
-	ST_DWithin(bp.position, ST_SetSRID(ST_MakePoint(ST_X(ST_AsEWKT(lp.position)), ST_Y(ST_AsEWKT(lp.position))),4326), 15)"
+	ST_DWithin(bp.position, ST_SetSRID(ST_MakePoint(ST_X(ST_AsEWKT(lp.position)), ST_Y(ST_AsEWKT(lp.position))),4326), #{SysConfig.config.search_radius})"
   end
 end

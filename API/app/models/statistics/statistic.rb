@@ -5,7 +5,7 @@ class Statistic
 
   def initialize(params)
     @bus_positions = params[:bus_positions] || BusPosition.all.count
-    @disposals = params[:disposals] || Disposal.select('disposal_reason, count(*)').group(:disposal_reason)
+    @disposals = params[:disposals] || Disposal.select('disposal_reason_id, count(*)').group(:disposal_reason_id)
   end
 
 end

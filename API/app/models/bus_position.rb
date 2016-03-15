@@ -21,9 +21,11 @@ class BusPosition < ActiveRecord::Base
     [:time, :latitude, :longitude, :speed, :bus_number, :line_number, :loaded_file_id]
   end
 
-  def self.from_week(line)
-    d = DateTime.now
-    BusPosition.where(:line_id => line.id).where('time BETWEEN ? AND ?', d.at_beginning_of_week, d).order(:time)
+  def self.statistics(line)
+    BusPosition.where(:line_id => line.id).
+      order("EXTRACT(DOW FROM bus_positions.time), EXTRACT(HOUR FROM bus_positions.time)").
+      select('EXTRACT(DOW FROM bus_positions.time) as dow, EXTRACT(HOUR FROM bus_positions.time) as time, count(*) as count, avg(speed) as speed').
+      group('EXTRACT(DOW FROM bus_positions.time), EXTRACT(HOUR FROM bus_positions.time)')
   end
 
   def self.in_radius(params = {})
