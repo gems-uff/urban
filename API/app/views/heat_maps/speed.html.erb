@@ -16,6 +16,12 @@
     $("form").submit(function (e) {
         e.preventDefault();
         buildVariables();
+
+        var cinza = "#cacaca";
+        var verde_claro = "#57ffac";
+        var verde_escuro = "#00cd67";
+        var vermelho_claro = "#ff5857"
+        var vermelho_escuro = "#e10100"
         $.get('<%=with_line_stops_positions_and_speed_avg_api_v1_bus_positions_path%>', {  line: line, dow: dow, date: date,
             time_end: time_end, time_begin: time_begin, diff: {dow: dow_diff, date: date_diff, time_end: time_end_diff,
                 time_begin: time_begin_diff}, format: 'json'})
@@ -33,31 +39,31 @@
                     }
                     else {
                         for (var i = 0; i < bus_positions.length - 1; i++) {
-                            var color = "#ff0000"
+                            var color = vermelho_escuro
                             var speed = bus_positions[i][2];
                             if ($('#diff').hasClass('active')) {
 
                                 //speed diff
                                 if (speed >= config.speed_hm_diff_range_4) {
-                                    color = "#00d204"
+                                    color = verde_escuro
                                 } else if (speed >= config.speed_hm_diff_range_3 && speed <= config.speed_hm_diff_range_4) {
-                                    color = "#008080"
+                                    color = verde_claro
                                 } else if (speed >= config.speed_hm_diff_range_2 && speed <= config.speed_hm_diff_range_3){
-                                    color = "#909090"
+                                    color = cinza
                                 }else if (speed >= config.speed_hm_diff_range_1 && speed >= config.speed_hm_diff_range_2) {
-                                    color = "#900000"
+                                    color = vermelho_claro
                                 }
                             }
                             else {
                                 //actual speed
                                 if (speed >=  config.speed_hm_query_range_3) {
-                                    color = "#00d204"
+                                    color = verde_escuro
                                 } else if (speed >= config.speed_hm_query_range_2 && speed <= config.speed_hm_query_range_3) {
-                                    color = "#008080"
+                                    color = verde_claro
                                 } else if (speed >= config.speed_hm_query_range_1 && speed <= config.speed_hm_query_range_2) {
-                                    color = "#900000"
+                                    color = vermelho_claro
                                 } else if (speed <= config.speed_hm_query_range_1) {
-                                    color = "#ff0000"
+                                    color = vermelho_escuro
                                 }
 
                             }
@@ -72,7 +78,6 @@
                             });
                             polylines.push(flightPath);
                             flightPath.setMap(map);
-
 
                             baseHeatmapPoints.push({location: new google.maps.LatLng(bus_positions[i][1],
                                     bus_positions[i][0]), weight: 1});
